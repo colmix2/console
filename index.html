@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P.M.C Atlantis - Terminal</title>
+    <style>
+        /* Общие настройки футуристичного терминала */
+        body {
+            background-color: #050b06;
+            color: #1aff24;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 30px;
+            margin: 0;
+            overflow-x: hidden;
+            text-shadow: 0 0 4px rgba(26, 255, 36, 0.5);
+        }
+
+        /* Эффект старого ЭЛТ-монитора (сканирующие линии) */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Виньетка (затемнение по углам экрана) */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.6) 100%);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .terminal {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Текст шапки */
+        .header-text {
+            color: #88ff88;
+            border-bottom: 1px dashed #1aff24;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .output {
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .prompt {
+            margin-right: 12px;
+            user-select: none;
+            font-weight: bold;
+            color: #88ff88;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: #1aff24;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            font-weight: bold;
+            outline: none;
+            flex-grow: 1;
+            text-shadow: 0 0 4px rgba(26, 255, 36, 0.5);
+        }
+
+        /* Ошибки подсвечиваем тревожным красным */
+        .error-msg {
+            color: #ff3333;
+            text-shadow: 0 0 4px rgba(255, 51, 51, 0.5);
+        }
+
+        /* Успех подсвечиваем ярким зеленым */
+        .success-msg {
+            color: #33ffff;
+            text-shadow: 0 0 4px rgba(51, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal">
+    <div class="header-text">
+===================================================================
+  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v4.82
+  WARNING: AUTHORIZED MILITARY PERSONNEL ONLY
+===================================================================</div>
+    
+    <div class="output" id="output">INITIALIZING CLIENT DECRYPTION MODULE... [OK]
+CONNECTING TO CENTRAL DATABASE... [CONNECTED]
+
+ACCESS RESTRICTED. IP RECORDED. INTERCEPT PROTOCOL ACTIVE.</div>
+
+    <div class="input-line">
+        <span class="prompt" id="prompt">ENTER OPERATOR ID:</span>
+        <input type="text" id="commandInput" autofocus autocomplete="off">
+    </div>
+</div>
+
+<script>
+    // НАСТРОЙКИ ДОСТУПА
+    const CORRECT_LOGIN = "admin";
+    const CORRECT_PASSWORD = "123";
+    const SECRET_LINK = "https://example.com";
+    
+    // Тексты ответов
+    const MSG_LOGIN_OK = "\n[SUCCESS] Идентификатор подтвержден. Проверка уровня допуска...";
+    const MSG_ACCESS_GRANTED = "\n\n[ACCESS GRANTED] Доступ к БД P.M.C \"Atlantis\" разрешен. Извлечение архивов...";
+    const MSG_ERROR = "\n<span class='error-msg'>[CRITICAL ERROR] ОТКАЗ В ДОСТУПЕ. Нарушение периметра безопасности. Попытка заблокирована.</span>";
+
+    const input = document.getElementById('commandInput');
+    const output = document.getElementById('output');
+    const prompt = document.getElementById('prompt');
+
+    let currentStep = 'login'; 
+
+    document.addEventListener('click', () => {
+        if (!input.disabled) input.focus();
+    });
+
+    function escapeHTML(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const value = input.value.trim();
+            if (!value) return;
+
+            if (currentStep === 'login') {
+                output.innerHTML += `\n\nENTER OPERATOR ID: ${escapeHTML(value)}`;
+                
+                if (value.toLowerCase() === CORRECT_LOGIN.toLowerCase()) {
+                    output.innerHTML += MSG_LOGIN_OK;
+                    currentStep = 'password';
+                    prompt.textContent = 'ENTER CRYPTO-KEY:';
+                    input.type = 'password';
+                } else {
+                    output.innerHTML += MSG_ERROR;
+                }
+                
+            } else if (currentStep === 'password') {
+                output.innerHTML += `\n\nENTER CRYPTO-KEY: ${'*'.repeat(value.length)}`;
+                
+                if (value === CORRECT_PASSWORD) {
+                    output.innerHTML += `<span class='success-msg'>${MSG_ACCESS_GRANTED}</span>`;
+                    input.disabled = true;
+                    input.blur();
+                    
+                    setTimeout(() => {
+                        window.location.href = SECRET_LINK;
+                    }, 2000);
+                } else {
+                    output.innerHTML += MSG_ERROR;
+                    
+                    // Возвращаем на шаг ввода логина
+                    currentStep = 'login';
+                    prompt.textContent = 'ENTER OPERATOR ID:';
+                    input.type = 'text';
+                }
+            }
+
+            input.value = '';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    });
+</script>
+
+</body>
+</html>
