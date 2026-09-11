@@ -12,7 +12,7 @@
         body::before{content:" ";display:block;position:fixed;top:0;left:0;bottom:0;right:0;background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,0.35) 50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03));z-index:9999;background-size:100% 4px,6px 100%;pointer-events:none;animation:flicker 0.2s infinite;}
         body::after{content:" ";display:block;position:fixed;top:0;left:0;bottom:0;right:0;background:radial-gradient(circle,transparent 50%,rgba(0,0,0,0.85) 100%);z-index:10000;pointer-events:none;}
         .terminal{max-width:850px;margin:0 auto;display:flex;flex-direction:column;}
-        .header-text{color:var(--accent-color);border-bottom:2px double var(--text-color);padding-bottom:15px;margin-bottom:25px;white-space:pre-wrap;font-weight:bold;letter-spacing:1px;display:none;}
+        .header-text{color:var(--accent-color);border-bottom:2px double var(--text-color);padding-bottom:15px;margin-bottom:25px;white-space:pre-wrap;font-weight:bold;letter-spacing:1px;display:none;opacity:0;transition:opacity 0.6s ease;}
         .output-container{display:flex;flex-direction:column;}
         .output-line{white-space:pre-wrap;line-height:1.5;letter-spacing:0.5px;margin-bottom:4px;word-break:break-all;}
         .input-line{display:flex;align-items:center;margin-top:15px;opacity:0;transition:opacity 0.5s ease;}
@@ -43,10 +43,24 @@
     function createLine(text,className=''){const line=document.createElement('div');line.className=`output-line ${className}`;line.textContent=text;DOM.output.appendChild(line);window.scrollTo(0,document.body.scrollHeight);return line;}
     function typeText(text,className='',callback=null){const line=createLine('',className);let i=0;function printChar(){if(i<text.length){line.textContent+=text.charAt(i);i++;setTimeout(printChar,CONFIG.TYPE_SPEED);}else if(callback){callback();}}printChar();}
     const fakeDumpLogs=["HEX: 0x4A 0xEF 0x12 0xBC -- MEMORY DUMP CORRUPTION DETECTED","BYPASSING COMPLEX FIREWALL LAYER 3... SUCCESS","STELTH_MOD: OVERRIDING CCTV MAIN FRAME... [DONE]","SPOOFING IP: MAC ADDR 00:1A:2B:3C:4D:5E MASKED AS INT-INTERNAL","DECRYPT_CORE: INJECTING PAYLOAD INTO SECURITY_SERVER.DLL","CLEANING LOGS: /VAR/LOG/SECURE ERASED SUCESSFULLY","PROXY: HOPS ACTIVATED: REJKJAVIK -> SINGAPORE -> MILITARY_NET","ANTIS_CYBER: BACKDOOR DETECTED ON PORT 8080 -- PURGING...","SYS_LOCK: AGENT PERIMETER ARMED AND ENCRYPTED SHA-512","WARN: INTRUSION ATTEMPT BLOCKED BY CAPP MODULE...","DOC_STEALER: PRE-LOADING EXFILTRATION SCRIPTS..."];
-    function runFlyingMatrixLog(count=0,maxCount=45){if(count<maxCount){const randomLog=fakeDumpLogs[Math.floor(Math.random()*fakeDumpLogs.length)];createLine(`[DEBUG] ${randomLog} // TIME: ${performance.now().toFixed(2)}ms`);const delay=count>maxCount-10?5:15;setTimeout(()=>runFlyingMatrixLog(count+1,maxCount),delay);}else{setTimeout(()=>{DOM.output.innerHTML='';DOM.header.style.display='block';playIntro();},300);}}
+    
+    function runFlyingMatrixLog(count=0,maxCount=50){
+        if(count<maxCount){
+            const randomLog=fakeDumpLogs[Math.floor(Math.random()*fakeDumpLogs.length)];
+            createLine(`[DEBUG] ${randomLog} // ADDR_VAL: 0x${(Math.random()*0xFFFFFF).toString(16).toUpperCase()}`);
+            setTimeout(()=>runFlyingMatrixLog(count+1,maxCount),7);
+        }else{
+            setTimeout(()=>{
+                DOM.output.innerHTML='';
+                DOM.header.style.display='block';
+                setTimeout(()=>{DOM.header.style.opacity='1';playIntro();},50);
+            },600);
+        }
+    }
+    
     function showProgressBar(callback){const line=createLine('','success-msg');let percent=0;function updateBar(){if(percent<=100){const size=20;const filled=Math.floor((percent/100)*size);const bar='█'.repeat(filled)+'░'.repeat(size-filled);line.textContent=`DECRYPTING STEALTH ARCHIVE: [${bar}] ${percent}%`;percent+=4;setTimeout(updateBar,40);}else if(callback){callback();}}updateBar();}
     const introLines=["SYS: BOOTING QUANTUM DECRYPTION CORES...","SYS: ESTABLISHING REVERSE PROXY VIA ONION-OVERLAY... [TUNNEL STABLE]","SYS: ANTI-CYBER ATTACK PARANOIA PROTOCOL (CAPP v9) IS ACTIVE.","SYS: PACKET INJECTION COMPLETED. STANDING BY FOR AGENT AUTHENTICATION.\n"];
-    function playIntro(index=0){if(index<introLines.length){typeText(introLines[index],'',()=>playIntro(index+1));}else{DOM.inputBlock.style.opacity='1';DOM.input.disabled=false;DOM.input.focus();}}
+    function playIntro(index=0){if(index<introLines.length){typeText(introLines[index],'','',()=>playIntro(index+1));typeText(introLines[index],'',()=>playIntro(index+1));}else{DOM.inputBlock.style.opacity='1';DOM.input.disabled=false;DOM.input.focus();}}
     DOM.input.disabled=true;runFlyingMatrixLog();
     DOM.input.addEventListener('keydown',function(e){
         if(e.key!=='Enter')return;const value=DOM.input.value.trim();DOM.input.value='';if(!value)return;
