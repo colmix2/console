@@ -31,7 +31,6 @@
             text-shadow: 0 0 4px var(--glow-color);
         }
 
-        /* Эффект мерцания ЭЛТ */
         @keyframes flicker {
             0% { opacity: 0.97; }
             50% { opacity: 1; }
@@ -76,6 +75,7 @@
             white-space: pre-wrap;
             font-weight: bold;
             letter-spacing: 1px;
+            display: none;
         }
 
         .output-container {
@@ -95,6 +95,8 @@
             display: flex;
             align-items: center;
             margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
 
         .prompt {
@@ -137,14 +139,14 @@
 <body>
 
 <div class="terminal">
-    <div class="header-text">======================================================================
+    <div class="header-text" id="headerText">======================================================================
   P.M.C. "ATLANTIS" // INFILTRATION & STEALTH OPERATIONS NETWORK
   SECURE NODAL TERMINAL v6.0.0-ALPHA // LEVEL 5 SECURITY OVERLAY
 ======================================================================</div>
     
     <div class="output-container" id="output"></div>
 
-    <div class="input-line">
+    <div class="input-line" id="inputLine">
         <span class="prompt" id="prompt">ENTER AGENT ID:</span>
         <input type="text" id="commandInput" autofocus autocomplete="off">
     </div>
@@ -155,19 +157,21 @@
         LOGIN: "Bill",
         PASSWORD: "324",
         SECRET_URL: "https://google.com",
-        TYPE_SPEED: 8 // Быстрая печать для более боевого вида
+        TYPE_SPEED: 12
     };
 
     const DOM = {
         input: document.getElementById('commandInput'),
         output: document.getElementById('output'),
-        prompt: document.getElementById('prompt')
+        prompt: document.getElementById('prompt'),
+        header: document.getElementById('headerText'),
+        inputBlock: document.getElementById('inputLine')
     };
 
     let currentStep = 'login'; 
 
     document.addEventListener('click', () => {
-        if (!DOM.input.disabled) DOM.input.focus();
+        if (!DOM.input.disabled && DOM.inputBlock.style.opacity === '1') DOM.input.focus();
     });
 
     function createLine(text, className = '') {
@@ -194,14 +198,42 @@
         printChar();
     }
 
-    // Имитация прогресс-бара для шпионского взлома/дешифровки
+    const fakeDumpLogs = [
+        "HEX: 0x4A 0xEF 0x12 0xBC -- MEMORY DUMP CORRUPTION DETECTED",
+        "BYPASSING COMPLEX FIREWALL LAYER 3... SUCCESS",
+        "STELTH_MOD: OVERRIDING CCTV MAIN FRAME... [DONE]",
+        "SPOOFING IP: MAC ADDR 00:1A:2B:3C:4D:5E MASKED AS INT-INTERNAL",
+        "DECRYPT_CORE: INJECTING PAYLOAD INTO SECURITY_SERVER.DLL",
+        "CLEANING LOGS: /VAR/LOG/SECURE ERASED SUCESSFULLY",
+        "PROXY: HOPS ACTIVATED: REJKJAVIK -> SINGAPORE -> MILITARY_NET",
+        "ANTIS_CYBER: BACKDOOR DETECTED ON PORT 8080 -- PURGING...",
+        "SYS_LOCK: AGENT PERIMETER ARMED AND ENCRYPTED SHA-512",
+        "WARN: INTRUSION ATTEMPT BLOCKED BY CAPP MODULE...",
+        "DOC_STEALER: PRE-LOADING EXFILTRATION SCRIPTS..."
+    ];
+
+    function runFlyingMatrixLog(count = 0, maxCount = 45) {
+        if (count < maxCount) {
+            const randomLog = fakeDumpLogs[Math.floor(Math.random() * fakeDumpLogs.length)];
+            createLine(`[DEBUG] ${randomLog} // TIME: ${performance.now().toFixed(2)}ms`);
+            const delay = count > maxCount - 10 ? 5 : 15; 
+            setTimeout(() => runFlyingMatrixLog(count + 1, maxCount), delay);
+        } else {
+            setTimeout(() => {
+                DOM.output.innerHTML = '';
+                DOM.header.style.display = 'block';
+                playIntro();
+            }, 300);
+        }
+    }
+
     function showProgressBar(callback) {
         const line = createLine('', 'success-msg');
         let percent = 0;
         
         function updateBar() {
             if (percent <= 100) {
-                const size = 20; // Длина полосы
+                const size = 20;
                 const filled = Math.floor((percent / 100) * size);
                 const empty = size - filled;
                 const bar = '█'.repeat(filled) + '░'.repeat(empty);
@@ -215,7 +247,6 @@
         updateBar();
     }
 
-    // Тексты в стиле скрытной кибер-разведки
     const introLines = [
         "SYS: BOOTING QUANTUM DECRYPTION CORES...",
         "SYS: ESTABLISHING REVERSE PROXY VIA ONION-OVERLAY... [TUNNEL STABLE]",
@@ -227,14 +258,14 @@
         if (index < introLines.length) {
             typeText(introLines[index], '', () => playIntro(index + 1));
         } else {
+            DOM.inputBlock.style.opacity = '1';
             DOM.input.disabled = false;
             DOM.input.focus();
         }
     }
 
-    // Старт
     DOM.input.disabled = true;
-    playIntro();
+    runFlyingMatrixLog();
 
     DOM.input.addEventListener('keydown', function(e) {
         if (e.key !== 'Enter') return;
@@ -267,31 +298,4 @@
                 DOM.input.blur();
                 
                 typeText("\n[ACCESS GRANTED] ДОСТУП К ОПЕРАТИВНОЙ БАЗЕ ДАННЫХ РАЗРЕШЕН.\n", 'success-msg', () => {
-                    showProgressBar(() => {
-                        typeText("\nСКАЧИВАНИЕ ДОКУМЕНТОВ ИЗ КОМПЛЕКСА ЗАВЕРШЕНО. ПЕРЕНАПРАВЛЕНИЕ НА ЗАЩИЩЕННЫЙ КАНАЛ...", 'success-msg', () => {
-                            setTimeout(() => {
-                                window.location.href = CONFIG.SECRET_URL;
-                            }, 1200);
-                        });
-                    });
-                });
-            } else {
-                triggerError();
-            }
-        }
-    });
-
-    function triggerError() {
-        DOM.input.disabled = true;
-        typeText("\n[WARNING] ОТКАЗ В ДОСТУПЕ. ЗАПУСКАЮ СКРЫТИЕ СЛЕДОВ ТРАФИКА ДЛЯ ХОСТА...\n", 'error-msg', () => {
-            currentStep = 'login';
-            DOM.prompt.textContent = 'ENTER AGENT ID:';
-            DOM.input.type = 'text';
-            DOM.input.disabled = false;
-            DOM.input.focus();
-        });
-    }
-</script>
-
-</body>
-</html>
+Use code with caution.showProgressBar(() => {typeText("\nСКАЧИВАНИЕ ДОКУМЕНТОВ ИЗ КОМПЛЕКСА ЗАВЕРШЕНО. ПЕРЕНАПРАВЛЕНИЕ НА ЗАЩИЩЕННЫЙ КАНАЛ...", 'success-msg', () => {setTimeout(() => {window.location.href = CONFIG.SECRET_URL;}, 1200);});});});} else {triggerError();}}});function triggerError() {DOM.input.disabled = true;typeText("\n[WARNING] ОТКАЗ В ДОСТУПЕ. ЗАПУСКАЮ СКРЫТИЕ СЛЕДОВ ТРАФИКА ДЛЯ ХОСТА...\n", 'error-msg', () => {currentStep = 'login';DOM.prompt.textContent = 'ENTER AGENT ID:';DOM.input.type = 'text';DOM.input.disabled = false;DOM.input.focus();});}
