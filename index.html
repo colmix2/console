@@ -67,15 +67,22 @@
             flex-direction: column;
         }
 
-        /* Оптимизированные стили для прозрачного PNG-логотипа */
+        .logo-wrapper {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 20px auto;
+            overflow: hidden;
+            position: relative;
+        }
+
         .terminal-logo {
             display: block;
-            margin: 0 auto 20px auto;
-            width: 180px;
+            width: 100%;
             height: auto;
-            /* Превращаем белый силуэт в зеленый за счет комбинации инверсии, сепии и hue-rotate */
-            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%) drop-shadow(0 0 10px var(--text-color));
-            opacity: 0.85;
+            position: absolute;
+            left: -180px;
+            filter: drop-shadow(180px 0 0 var(--text-color)) drop-shadow(180px 0 10px var(--glow-color));
+            opacity: 0.9;
         }
 
         .header-text {
@@ -145,11 +152,13 @@
 <body>
 
 <div class="terminal">
-    <!-- Подключение нового прозрачного файла -->
-    <img src="atlantis-logo.png" class="terminal-logo" alt="PMC Atlantis Logo">
+    <div class="logo-wrapper">
+        <!-- Альтернативный текст убран, чтобы при ошибке загрузки ничего лишнего не рисовалось -->
+        <img id="logoImg" class="terminal-logo" src="">
+    </div>
 
     <div class="header-text">===================================================================
-  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v5.30
+  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v5.50
   WARNING: AUTHORIZED MILITARY PERSONNEL ONLY
 ===================================================================</div>
     
@@ -166,14 +175,19 @@
         LOGIN: "Bill",
         PASSWORD: "324",
         SECRET_URL: "https://google.com",
-        TYPE_SPEED: 15
+        TYPE_SPEED: 15,
+        LOGO_FILE: "atlantis-logo.png" // Убедитесь, что на Гитхабе файл называется ИМЕННО ТАК (маленькими буквами)
     };
 
     const DOM = {
         input: document.getElementById('commandInput'),
         output: document.getElementById('output'),
-        prompt: document.getElementById('prompt')
+        prompt: document.getElementById('prompt'),
+        logo: document.getElementById('logoImg')
     };
+
+    // Хак для принудительного обновления кэша картинок на GitHub Pages
+    DOM.logo.src = `${CONFIG.LOGO_FILE}?t=${new Date().getTime()}`;
 
     let currentStep = 'login'; 
 
