@@ -69,14 +69,18 @@ function addLine(txt, cls = "") {
 async function type(txt, cls = "") {
     const d = addLine("", cls);
     for (let i = 0; i < txt.length; i++) {
-        d.textContent += txt.charAt(i); if (Math.random() > 0.3) playBeep(800, 'square', 0.02); await delay(CFG.SPD);
+        d.textContent += txt.charAt(i); 
+        if (Math.random() > 0.3) playBeep(800, 'square', 0.02); 
+        await delay(CFG.SPD);
     }
 }
 
 async function runBootLogs() {
     const p = ["BYPASSING FIREWALL... SUCCESS", "STEALTH MODE: CCJV OVERRIDE... [DONE]", "SPOOFING IP... INT-INTERNAL", "CLEANING LOGS... ERASED", "ANTI-CYBER ATTACK PROTOCOL ACTIVE."];
     for (let i = 0; i < p.length; i++) {
-        await delay(150 + (performance.now() / 1000).toFixed(3) * 2); addLine("[DEBUG] " + Math.floor(Math.random() * p.length) + "| " + p[i], 'gray'); playBeep(120, 'sawtooth', 0.01);
+        await delay(150 + (performance.now() / 1000).toFixed(3) * 2); 
+        addLine("[DEBUG] " + Math.floor(Math.random() * p.length) + "| " + p[i], 'gray'); 
+        playBeep(120, 'sawtooth', 0.01);
     }
     await delay(300); 
     await type("SYS: FOR MAIN DATABASE ACCESS - ENTER 'BASE'.", "gray");
@@ -90,53 +94,100 @@ function err(m) { DOM.term.classList.add('shake'); playBeep(140, 'triangle', 0.3
 
 async function bar() {
     const d = addLine("", 'success');
-    for (let p = 0; p <= 100; p += 5) { d.textContent = `DECRYPTING: [${"#".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; playBeep(600 + p * 2, 'sine', 0.02); await delay(40); }
+    for (let p = 0; p <= 100; p += 5) { 
+        d.textContent = `DECRYPTING: [${"#".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; 
+        playBeep(600 + p * 2, 'sine', 0.02); 
+        await delay(40); 
+    }
 }
 
 async function startMiniGame() {
     step = 'game'; stage = 0;
     await type(">>> ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ДЕШИФРОВКИ...", "success");
-    await type(">>> ИНСТРУКЦИЯ: НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ!", "gray");
-    await delay(500); nextStage();
+    await type(">>> ИНСТРУКЦИЯ: НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ ПРИ СТАБИЛИЗАЦИИ!", "gray");
+    await delay(500); 
+    nextStage();
 }
 
 function nextStage() {
-    if (stage >= 3) { endMiniGame(); return; }
+    if (stage >= 3) { 
+        endMiniGame(); 
+        return; 
+    }
     const st = ["CONNECTING TO DATABASE...", "OVERRIDING SECURITY...", "EXTRACTING HASHES..."];
-    addLine(st[stage], "success"); const d = addLine("", "gray");
+    addLine(st[stage], "success"); 
+    const d = addLine("", "gray");
     gameInterval = setInterval(() => {
         let ch = "0123456789ABCDEFXYZ!@#%", hex = Array.from({length: 8}, () => ch[Math.floor(Math.random() * ch.length)]).join("");
-        d.textContent = `[BRUTEFORCE FLOW #${stage + 1}]: ` + hex; playBeep(400, 'sine', 0.005);
+        d.textContent = `[BRUTEFORCE FLOW #${stage + 1}]: ` + hex; 
+        playBeep(400, 'sine', 0.005);
     }, 60);
-    DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus();
+    DOM.inp.disabled = false; 
+    DOM.blk.classList.add('active'); 
+    DOM.inp.focus();
 }
 
 async function endMiniGame() {
-    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
+    clearInterval(gameInterval); 
+    DOM.blk.classList.remove('active'); 
+    DOM.inp.disabled = true;
     await bar();
     await type(">>> УСПЕХ! БАЗА ДАННЫХ СКОМПРОМЕТИРОВАНА.", "success");
     await type(">>> НАЙДЕНЫ ЛОГИ СОТРУДНИКА BILL. КЛЮЧ: " + CFG.PASS, "success");
-    await delay(2000); ask('AGENT ID / EMPLOYEE:', 'login', false);
+    await delay(2000); 
+    ask('AGENT ID / EMPLOYEE:', 'login', false);
 }
 
-DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
+DOM.inp.oninput = () => { 
+    if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; 
+};
+
 DOM.inp.onkeydown = async (e) => {
     if (e.key !== 'Enter') return;
-    if (step === 'game') { clearInterval(gameInterval); playBeep(900, 'square', 0.1); addLine(">>> УЗЕЛ СЕГМЕНТА ЗАФИКСИРОВАН.", "success"); stage++; await delay(400); nextStage(); return; }
-    const v = DOM.inp.value, cv = v.trim(); if (!v) return;
-    DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
-    addLine(DOM.pr.textContent + " " + (isMask ? "*".repeat(v.length) : cv), 'success'); await delay(300);
+    
+    if (step === 'game') { 
+        clearInterval(gameInterval); 
+        playBeep(900, 'square', 0.1); 
+        addLine(">>> УЗЕЛ СЕГМЕНТА ЗАФИКСИРОВАН.", "success"); 
+        stage++; 
+        await delay(400); 
+        nextStage(); 
+        return; 
+    }
+    
+    const v = DOM.inp.value, cv = v.trim(); 
+    if (!v) return;
+    
+    DOM.blk.classList.remove('active'); 
+    DOM.inp.disabled = true;
+    addLine(DOM.pr.textContent + " " + (isMask ? "*".repeat(v.length) : cv), 'success'); 
+    await delay(300);
     
     if (step === 'login') {
-        if (cv.toLowerCase() === 'base') startMiniGame();
-        else if (cv.toLowerCase() === CFG.LOGIN) ask('ENTER PASSKEY:', 'pass', true);
-        else { err("DENIED: UNKNOWN ID."); await delay(1000); ask('AGENT ID / EMPLOYEE:', 'login', false); }
+        if (cv.toLowerCase() === 'base') {
+            startMiniGame();
+        } else if (cv.toLowerCase() === CFG.LOGIN) {
+            ask('ENTER PASSKEY:', 'pass', true);
+        } else { 
+            err("DENIED: UNKNOWN ID."); 
+            await delay(1000); 
+            ask('AGENT ID / EMPLOYEE:', 'login', false); 
+        }
     } else if (step === 'pass') {
-        if (cv === CFG.PASS) { await bar(); await type("ДОБРО ПОЖАЛОВАТЬ, " + CFG.LOGIN.toUpperCase(), "success"); await type("ДОСТУП ОТКРЫТ. КОНЕЦ СВЯЗИ.", "success"); }
-        else { err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
+        if (cv === CFG.PASS) { 
+            await bar(); 
+            await type("ДОБРО ПОЖАЛОВАТЬ, " + CFG.LOGIN.toUpperCase(), "success"); 
+            await type("ДОСТУП ОТКРЫТ. КОНЕЦ СВЯЗИ.", "success"); 
+        } else { 
+            err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); 
+            await delay(1500); 
+            ask('AGENT ID / EMPLOYEE:', 'login', false); 
+        }
     }
 };
-document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); window.onload = runBootLogs;
+
+document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); 
+window.onload = runBootLogs;
 </script>
 </body>
 </html>
