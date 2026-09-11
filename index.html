@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATLANTIS // SECURE TERMINAL v4.0</title>
     <style>
-        :root { --glow: #00ff41; --bg: #020504; --bg-panel: rgba(2, 15, 5, 0.7); --err: #ff1111; --acc: #00ffff; }
+        :root { --glow: #00ff41; --bg: #020504; --bg-panel: rgba(2,15,5,0.7); --err: #ff1111; --acc: #00ffff; }
         body { background-image: url('https://githubusercontent.com'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; background-color: var(--bg); color: var(--glow); font-family: 'Courier New', monospace; font-size: 15px; margin: 0; padding: 40px 20px; min-height: 100vh; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow-x: hidden; }
         body::before, body::after { content: " "; display: block; position: fixed; inset: 0; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); z-index: 999; background-size: 100% 4px, 6px 100%; pointer-events: none; }
         body::after { background: linear-gradient(rgba(0,0,0,0) 90%, rgba(0,255,65,0.05) 95%, rgba(0,0,0,0) 100%); background-size: 100% 300%; animation: scanline 6s linear infinite; z-index: 1000; }
@@ -30,7 +30,6 @@
     </style>
 </head>
 <body>
-
 <div class="terminal-box" id="term">
     <div class="header" id="hd">
         <img src="atlantis.png" class="hub-logo" alt="ATLANTIS LOGO">
@@ -45,7 +44,6 @@
         </div>
     </div>
 </div>
-
 <script>
 const CFG = { LOGIN: "bill", PASS: "324", SPD: 15 };
 const DOM = { term: document.getElementById('term'), inp: document.getElementById('inp'), view: document.getElementById('view'), out: document.getElementById('out'), pr: document.getElementById('pr'), blk: document.getElementById('blk') };
@@ -85,7 +83,7 @@ async function runBootLogs() {
     await delay(300); 
     await type("SYS: FOR MAIN DATABASE ACCESS - ENTER 'BASE'.", "gray");
     await type("SYS: FOR EMPLOYEE LOGIN - ENTER RELEVANT ID NAME.", "gray");
-    await type("SYS: STANDING BY ДЛЯ ВВОДА ДАННЫХ...", "success"); 
+    await type("SYS: STANDING BY...", "success"); 
     ask('AGENT ID / EMPLOYEE:', 'login', false);
 }
 
@@ -100,13 +98,11 @@ async function bar() {
         await delay(40); 
     }
 }
-<script>
 async function startMiniGame(keyMode = false) {
     step = 'game'; stage = 0; isKeyGame = keyMode;
     await type(">>> ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ДЕШИФРОВКИ...", "success");
-    await type(">>> ИНСТРУКЦИЯ: НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ ПРИ СТАБИЛИЗАЦИИ!", "gray");
-    await delay(500); 
-    nextStage();
+    await type(">>> НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ ПРИ СТАБИЛИЗАЦИИ!", "gray");
+    await delay(500); nextStage();
 }
 
 function nextStage() {
@@ -115,34 +111,27 @@ function nextStage() {
         return; 
     }
     const st = isKeyGame ? ["OPENING SECURE CRYPTO CHANNEL...", "DECRYPTING KEY STREAMS...", "PARSING BASE CODES..."] : ["CONNECTING TO DATABASE...", "OVERRIDING SECURITY...", "EXTRACTING HASHES..."];
-    addLine(st[stage], "success"); 
-    const d = addLine("", "gray");
+    addLine(st[stage], "success"); const d = addLine("", "gray");
     gameInterval = setInterval(() => {
         let ch = "0123456789ABCDEFXYZ!@#%", hex = Array.from({length: 8}, () => ch[Math.floor(Math.random() * ch.length)]).join("");
         d.textContent = (isKeyGame ? `[DECRYPT KEY FLOW #${stage + 1}]: ` : `[BRUTEFORCE FLOW #${stage + 1}]: `) + hex; 
         playBeep(400, 'sine', 0.005);
     }, 60);
-    DOM.inp.disabled = false; 
-    DOM.blk.classList.add('active'); 
-    DOM.inp.focus();
+    DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus();
 }
 
 async function endMiniGame() {
-    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
-    await bar();
+    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true; await bar();
     await type(">>> УСПЕХ! БАЗА ДАННЫХ СКОМПРОМЕТИРОВАНА.", "success");
     await type(">>> НАЙДЕНЫ ЛОГИ СОТРУДНИКА BILL. КЛЮЧ: " + CFG.PASS, "success");
-    await delay(2000); 
-    ask('AGENT ID / EMPLOYEE:', 'login', false);
+    await delay(2000); ask('AGENT ID / EMPLOYEE:', 'login', false);
 }
 
 async function endKeyGame() {
-    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
-    await bar();
+    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true; await bar();
     await type(">>> РАСШИФРОВКА КЛЮЧЕЙ ЗАВЕРШЕНА.", "success");
     await type(">>> ГЛАВНЫЙ КЛЮЧ К БАЗАМ ДАННЫХ: ATLANTIS111", "success");
-    await delay(2500);
-    showEmployeeMenu();
+    await delay(2500); showEmployeeMenu();
 }
 
 async function showEmployeeMenu() {
@@ -156,71 +145,31 @@ async function showEmployeeMenu() {
     ask('ВЫБЕРИТЕ ПУНКТ (1-3):', 'menu', false);
 }
 
-DOM.inp.oninput = () => { 
-    if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; 
-};
-
+DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
 DOM.inp.onkeydown = async (e) => {
     if (e.key !== 'Enter') return;
-    
     if (step === 'game') { 
-        clearInterval(gameInterval); 
-        playBeep(900, 'square', 0.1); 
-        addLine(">>> УЗЕЛ СЕГМЕНТА ЗАФИКСИРОВАН.", "success"); 
-        stage++; 
-        await delay(400); 
-        nextStage(); 
-        return; 
+        clearInterval(gameInterval); playBeep(900, 'square', 0.1); addLine(">>> УЗЕЛ СЕГМЕНТА ЗАФИКСИРОВАН.", "success"); stage++; await delay(400); nextStage(); return; 
     }
-    
-    const v = DOM.inp.value, cv = v.trim(); 
-    if (!v) return;
-    
-    DOM.blk.classList.remove('active'); 
-    DOM.inp.disabled = true;
-    addLine(DOM.pr.textContent + " " + (isMask ? "*".repeat(v.length) : cv), 'success'); 
-    await delay(300);
+    const v = DOM.inp.value, cv = v.trim(); if (!v) return;
+    DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
+    addLine(DOM.pr.textContent + " " + (isMask ? "*".repeat(v.length) : cv), 'success'); await delay(300);
     
     if (step === 'login') {
-        if (cv.toLowerCase() === 'base') {
-            startMiniGame(false);
-        } else if (cv.toLowerCase() === CFG.LOGIN) {
-            ask('ENTER PASSKEY:', 'pass', true);
-        } else { 
-            err("DENIED: UNKNOWN ID."); 
-            await delay(1000); 
-            ask('AGENT ID / EMPLOYEE:', 'login', false); 
-        }
+        if (cv.toLowerCase() === 'base') startMiniGame(false);
+        else if (cv.toLowerCase() === CFG.LOGIN) ask('ENTER PASSKEY:', 'pass', true);
+        else { err("DENIED: UNKNOWN ID."); await delay(1000); ask('AGENT ID / EMPLOYEE:', 'login', false); }
     } else if (step === 'pass') {
-        if (cv === CFG.PASS) { 
-            await bar(); 
-            showEmployeeMenu();
-        } else { 
-            err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); 
-            await delay(1500); 
-            ask('AGENT ID / EMPLOYEE:', 'login', false); 
-        }
+        if (cv === CFG.PASS) { await bar(); showEmployeeMenu(); }
+        else { err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
     } else if (step === 'menu') {
-        if (cv === '1') {
-            startMiniGame(true);
-        } else if (cv === '2') {
-            await type(">>> СТАТУС СЕТИ: СТАТИЧНЫЙ. ВСЕ УЗЛЫ СТАБИЛЬНЫ.", "gray");
-            await delay(1000);
-            showEmployeeMenu();
-        } else if (cv === '3') {
-            await type(">>> ВЫХОД ИЗ СИСТЕМЫ...", "gray");
-            await delay(1000);
-            ask('AGENT ID / EMPLOYEE:', 'login', false);
-        } else {
-            err("ОШИБКА: НЕВЕРНЫЙ ВЫБОР. ВВЕДИТЕ ЧИСЛО ОТ 1 ДО 3.");
-            await delay(1000);
-            ask('ВЫБЕРИТЕ ПУНКТ (1-3):', 'menu', false);
-        }
+        if (cv === '1') startMiniGame(true);
+        else if (cv === '2') { await type(">>> СТАТУС СЕТИ: СТАТИЧНЫЙ. ВСЕ УЗЛЫ СТАБИЛЬНЫ.", "gray"); await delay(1000); showEmployeeMenu(); }
+        else if (cv === '3') { await type(">>> ВЫХОД ИЗ СИСТЕМЫ...", "gray"); await delay(1000); ask('AGENT ID / EMPLOYEE:', 'login', false); }
+        else { err("НЕВЕРНЫЙ ВЫБОР. ВВЕДИТЕ ОТ 1 ДО 3."); await delay(1000); ask('ВЫБЕРИТЕ ПУНКТ (1-3):', 'menu', false); }
     }
 };
-
-document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); 
-window.onload = runBootLogs;
+document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); window.onload = runBootLogs;
 </script>
 </body>
 </html>
