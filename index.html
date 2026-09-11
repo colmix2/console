@@ -192,7 +192,13 @@
     </div>
 </div>
 <script>
-const CFG = { LOGIN: "bill", PASS: "324", SPD: 15 };
+const CFG = { 
+    USERS: {
+        "bill": "324",
+        "andrey": "345"
+    }, 
+    SPD: 15 
+};
 const DOM = { 
     term: document.getElementById('term'), 
     inp: document.getElementById('inp'), 
@@ -202,6 +208,8 @@ const DOM = {
     blk: document.getElementById('blk') 
 };
 let step = 'login', isMask = false, gameInterval = null, stage = 0, targetWord = "", wordTimer = null, isKeyGame = false;
+let currentUser = "", chosenKeyIdx = -1, correctReportOption = -1;
+const CRYPTO_KEYS = ["ATL-4091", "ATL-1182", "ATL-7634", "ATL-9901", "ATL-2543"];
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
 let audioCtx = null;
@@ -239,7 +247,6 @@ function addLine(txt, cls = "") {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
     return d;
 }
-
 async function type(txt, cls = "") {
     const d = addLine("", cls);
     for (let i = 0; i < txt.length; i++) {
@@ -323,217 +330,137 @@ async function bar() {
         await delay(40); 
     }
 }
-
-async function startSpeedGame() {
-    step = 'speed_game';
-    stage = 0;
-    document.body.classList.add('alarm');
-    playBeep(220, 'sawtooth', 0.5);
-    playBeep(180, 'sawtooth', 0.5);
-    err("⚠️ CRITICAL SECURITY ALERT: FOREIGN IP DETECTED!");
-    await delay(600);
-    await type(">>> АКТИВИРОВАНА СИСТЕМА ЭКСТРЕННОЙ БЛОКИРОВКИ БАЗЫ ДАННЫХ!", "error");
-    await type(">>> ИСКАЖЕНИЕ ТРАФИКА! ВВОДИТЕ СЛОВА СТРОГО ЗАДОМ НАПЕРЕД!", "error");
-    await delay(300);
-    nextSpeedWord();
+async function showEmployeeMenu() {
+    await type("========================================", "gray");
+    await type("ДОБРО ПОЖАЛОВАТЬ, " + currentUser.toUpperCase() + "!", "success");
+    await type("ВЫБЕРИТЕ ОПЦИЮ СИСТЕМЫ [1-4]:", "gray");
+    await type("1. КЛЮЧИ ДЕШИФРАТОРА", "success");
+    await type("2. ОТЧЁТЫ ДЕПАРТАМЕНТА", "success");
+    await type("3. ДЕПАРТАМЕНТЫ КОНТРАКТНИКОВ", "success");
+    await type("4. ВЫЙТИ ИЗ АККАУНТА", "success");
+    await type("========================================", "gray");
+    ask('ВЫБЕРИТЕ ПУНКТ (1-4):', 'menu', false);
 }
 
-function nextSpeedWord() {
-    if (stage >= 3) {
-        successSpeedGame();
-        return;
+async function displayCryptoKeysOnly() {
+    await type(">>> ИЗВЛЕЧЕНИЕ АКТИВНЫХ КЛЮЧЕЙ ДЕШИФРАТОРА СЕССИИ...", "gray");
+    await bar();
+    await type("----------------------------------------", "gray");
+    for(let i = 0; i < CRYPTO_KEYS.length; i++) {
+        addLine(`КЛЮЧ №${i + 1}: [ ${CRYPTO_KEYS[i]} ]`, "success");
     }
-    const words = ["OVERRIDE", "DECRYPT", "BYPASS", "INTRUDER", "EXPLOIT"];
-    const rawWord = words[Math.floor(Math.random() * words.length)];
-    targetWord = rawWord.split("").reverse().join("");
-    addLine(`[ФАЗА 1 - ЭТАП ${stage + 1}/3] ИСХОДНЫЙ КОД: ${rawWord}`, "error");
-    ask('ВВЕДИТЕ РЕВЕРС-КОД:', 'speed_game', false);
-    clearTimeout(wordTimer);
-    wordTimer = setTimeout(() => die("🚨 ПРЕВЫШЕНО ВРЕМЯ ОЖИДАНИЯ ФАЗЫ 1. ЛОКДАУН."), 6000);
+    await type("----------------------------------------", "gray");
+    await type("🚨 ЗАПОМНИТЕ ИЛИ СФОТКАЙТЕ ДАННЫЕ КЛЮЧИ!", "error");
+    await type("ВОЗВРАТ В МЕНЮ ЧЕРЕЗ 5 СЕКУНД...", "gray");
+    setTimeout(() => { DOM.out.innerHTML = ""; showEmployeeMenu(); }, 5000);
 }
 
-async function successSpeedGame() {
-    clearTimeout(wordTimer);
-    document.body.classList.remove('alarm');
-    await type(">>> КОНТРАТАКА ОТРАЖЕНА! ЗАЩИТА БАЗЫ ДАННЫХ СЛОМАНА.", "success");
-    await delay(600);
-    await type("[ШТАБ]: Узел связи перехвачен. Инициализация аудио-протокола...", "success");
-    await delay(1500);
-    await type("[ШТАБ]: Ахх... ну да. Молодец, гуд... гуд...", "success");
-    await delay(1000);
-    await type("[ШТАБ]: Признаться, я до последнего думал, что наши безопасники тебя отрубят. Но ты упрямый.", "success");
-    await delay(1200);
-    await type("[ШТАБ]: Давай начистоту. Что конкретно ты хочешь здесь найти?", "success");
-    await delay(800);
+// ПУНКТ 3: Открытие подменю с подразделами L.a.S и T.F.B
+async function showContractorsDepartmentMenu() {
+    await type("=== СЕТЕВОЕ ОКРУЖЕНИЕ КОНТРАКТНИКОВ ===", "success");
+    addLine("1. Департамент L.a.S", "success");
+    addLine("2. Департамент T.F.B", "success");
+    addLine("3. НАЗАД В ГЛАВНОЕ МЕНЮ", "gray");
+    ask('ВЫБЕРИТЕ ПОДРАЗДЕЛ (1-3):', 'contractors_menu', false);
+}
+
+function startAndreyPhase1() {
+    DOM.out.innerHTML = "";
+    err("⚠️ КРИПТОГРАФИЧЕСКИЙ ТЕСТ: ИМПУЛЬСНЫЙ СДВИГ ЧАСТОТ! ФАЗА 1/4");
+    let numParts = Array.from({length: 4}, () => Math.floor(Math.random() * 9) + 1);
+    let rawNumberStr = numParts.join("");
+    let shift = Math.floor(Math.random() * 2) + 1; 
     
-    DOM.term.classList.add('shake');
-    playBeep(90, 'sawtooth', 0.6);
-    playBeep(70, 'triangle', 0.6);
-    setTimeout(() => DOM.term.classList.remove('shake'), 600);
+    targetWord = numParts.map(n => (n + shift) % 10).join("");
     
-    await type("[ШТАБ]: Ты сейчас ковыряешься в закрытом секторе и ОЧЕНЬ СИЛЬНО нам мешаешь! Для чего всё это?", "error");
-    await delay(2000);
-    await type("[ШТАБ]: Впрочем, мне плевать на твои мотивы. Мы тебя запеленговали.", "success");
-    await delay(800);
-    await type("[ШТАБ]: Перехожу на ручной протокол изоляции. Прощай, Агент.", "error");
-    await delay(1200);
-    startPhaseTwo();
-}
-
-async function startPhaseTwo() {
-    step = 'phase2';
-    stage = 0;
-    document.body.classList.add('alarm');
-    err("🚨 АВАРИЙНАЯ БЛОКИРОВКА СЕТЕВОГО ОКРУЖЕНИЯ! ФАЗА 2");
-    await delay(600);
-    await type(">>> ШТАБ ИЗОЛИРУЕТ НАШ IP! ПЕРЕХВАТЫВАЙТЕ КООРДИНАТЫ УЗЛОВ!", "error");
-    nextPhaseTwoNode();
-}
-
-function nextPhaseTwoNode() {
-    if (stage >= 4) {
-        startPhaseThree();
-        return;
-    }
-    const letters = ["A", "B", "C", "D", "X", "Y"];
-    const numbers = ["1", "2", "3", "4", "5"];
-    targetWord = letters[Math.floor(Math.random() * letters.length)] + numbers[Math.floor(Math.random() * numbers.length)];
-    addLine(`[ФАЗА 2 - УЗЕЛ ${stage + 1}/4] КАНАЛ СВЯЗИ: МАТРИЦА ${targetWord}`, "error");
-    const timeLimit = 5000 - (stage * 1000);
-    ask('ВВЕДИТЕ КООРДИНАТУ:', 'phase2', false);
+    addLine(`>>> ИСХОДНЫЙ СИГНАЛ:   [ ${rawNumberStr} ]`, "error");
+    addLine(`>>> ПОПРАВКА СДВИГА:  [ +${shift} К КАЖДОЙ ЦИФРЕ ОТДЕЛЬНО ]`, "gray");
+    ask('ВВЕДИТЕ ДЕКОД-ИМПУЛЬС:', 'andrey_p1_check', false);
     clearTimeout(wordTimer);
-    wordTimer = setTimeout(() => die("🚨 МАТРИЧНАЯ БЛОКИРОВКА ЗАВЕРШЕНА. ВЫ ОТКЛЮЧЕНЫ."), timeLimit);
-}
-async function startPhaseThree() {
-    step = 'phase3'; 
-    stage = 0;
-    addLine(">>> СЕТЕВОЙ КОНТУР ФАЗЫ 2 СТАБИЛИЗИРОВАН.", "success"); 
-    await delay(500);
-    await type("[ШТАБ]: С-Система... потеряна... Запуск протокола ВЫЖИГАНИЯ ЯДРА...", "error");
-    await type("[ШТАБ]: Гори в аду, Агент.", "error"); 
-    await delay(800);
-    err("🚨 ВНИМАНИЕ: ЗАПУЩЕН ПРОТОКОЛ ПОЛНОГО СТИРАНИЯ ЯДРА СЕРВЕРА! ФАЗА 3"); 
-    await delay(600);
-    nextPhaseThreeNode();
+    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 1. КАНАЛ СБРОШЕН."), 12000);
 }
 
-function nextPhaseThreeNode() {
-    if (stage >= 3) { 
-        startPhaseFour(); 
-        return; 
-    }
-    DOM.blk.classList.remove('active'); 
-    DOM.inp.disabled = true;
-    let rd = Array.from({length: 3}, () => Math.floor(Math.random() * 10));
-    targetWord = rd.join(""); 
-    const d = addLine(`[ФАЗА 3 - КЛЮЧ ЯДРА ${stage + 1}/3] ЧАСТОТА: ` + targetWord, "success"); 
-    playBeep(900, 'sine', 0.1);
-    setTimeout(() => { 
-        d.textContent = `[ФАЗА 3 - КЛЮЧ ЯДРА ${stage + 1}/3] ЧАСТОТА: [СКРЫТО]`; 
-        ask('ВВЕДИТЕ СИНХРО-ЧАСТОТУ:', 'phase3', false); 
-    }, 2500);
-    clearTimeout(wordTimer); 
-    wordTimer = setTimeout(() => die("🚨 ЯДРО ВЫЖЖЕНО. ОПЕРАЦИЯ ПРОВАЛЕНА."), 6000);
+function startAndreyPhase2() {
+    clearTimeout(wordTimer);
+    addLine(">>> ПОТОК СДВИГА СИНХРОНИЗИРОВАН.", "success");
+    err("🚨 ТЕСТ ЗРИТЕЛЬНОЙ МАТРИЦЫ: СЛЕПОЕ ПЯТНО! ФАЗА 2/4");
+    
+    let chars = "ABCXYZ12345";
+    let flashCode = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    targetWord = flashCode;
+    
+    const d = addLine(`>>> МГНОВЕННЫЙ МАРКЕР ДОСТУПА: [ ${flashCode} ]`, "error");
+    playBeep(1100, 'sine', 0.15);
+    
+    setTimeout(() => {
+        d.textContent = `>>> МГНОВЕННЫЙ МАРКЕР ДОСТУПА: [ СКРЫТО СИСТЕМОЙ ]`;
+        ask('ВВЕДИТЕ КОД ПО ПАМЯТИ:', 'andrey_p2_check', false);
+    }, 1500);
+    
+    clearTimeout(wordTimer);
+    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 2. СЕТЬ ЗАБЛОКИРОВАНА."), 12000);
 }
 
-async function startPhaseFour() {
-    step = 'phase4'; 
-    stage = 0;
-    addLine(">>> ЧАСТОТЫ ЯДРА ФАЗЫ 3 СИНХРОНИЗИРОВАНЫ.", "success"); 
-    await delay(600);
-    err("🚨 АЛАРМ: ШТАБ ВКЛЮЧИЛ АУДИО-ГЛУШИЛКУ! ФАЗА 4");
-    await type(">>> ПОВТОРЯЙТЕ СЕРИИ СИГНАЛОВ КЛАВИШАМИ H (ВЫСОКИЙ) И L (НИЗКИЙ)!", "error"); 
-    nextPhaseFourAudio();
+function startAndreyPhase3() {
+    clearTimeout(wordTimer);
+    addLine(">>> МАТРИЦА ПАМЯТИ ПОДТВЕРЖДЕНА.", "success");
+    err("🚨 БИОМЕТРИЧЕСКИЙ АНАЛИЗ ЧАСТОТНЫХ ВОЛН! ФАЗА 3/4");
+    
+    let peaksCount = Math.floor(Math.random() * 4) + 2; 
+    targetWord = peaksCount.toString();
+    
+    let wave = "_";
+    for(let i=0; i<peaksCount; i++) {
+        wave += "/\\_";
+        if(Math.random() > 0.5) wave += "__";
+    }
+    
+    addLine(`>>> СНЯТИЕ ПОКАЗАТЕЛЕЙ ВОЛНЫ: [ ${wave} ]`, "error");
+    addLine(`>>> СКОЛЬКО ЧАСТОТНЫХ ПИКОВ (ВСПЛЕСКОВ \"/\\\") НАХОДИТСЯ НА ГРАФИКЕ?`, "gray");
+    ask('ВВЕДИТЕ КОЛИЧЕСТВО ПИКОВ:', 'andrey_p3_check', false);
+    clearTimeout(wordTimer);
+    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 3. ОПЕРАЦИЯ ОТМЕНЕНА."), 12000);
 }
 
-function nextPhaseFourAudio() {
-    if (stage >= 3) { 
-        startPhaseFive(); 
-        return; 
-    }
-    DOM.blk.classList.remove('active'); 
-    DOM.inp.disabled = true;
-    let seq = []; 
-    for(let i=0; i<3+stage; i++) {
-        seq.push(Math.random() > 0.5 ? "H" : "L");
-    }
-    targetWord = seq.join(""); 
-    addLine(`[ФАЗА 4 - СИГНАЛ ${stage + 1}/3] ВОСПРОИЗВЕДЕНИЕ...`, "error");
-    triggerAudioChain(targetWord, 0);
+function startAndreyPhase4() {
+    clearTimeout(wordTimer);
+    addLine(">>> ЧАСТОТЫ ВОЛН ЗАФИКСИРОВАНЫ.", "success");
+    err("🚨 ОКОНЧАТЕЛЬНАЯ ПРОВЕРКА КЛЮЧА ДЕШИФРАТОРА! ФАЗА 4/4");
+    
+    chosenKeyIdx = Math.floor(Math.random() * CRYPTO_KEYS.length);
+    targetWord = CRYPTO_KEYS[chosenKeyIdx];
+    
+    addLine(`>>> ВВЕДИТЕ РАСШИФРОВАННЫЙ КЛЮЧ ШИФРАТОРА №${chosenKeyIdx + 1}:`, "error");
+    ask('ВВЕДИТЕ КЛЮЧ:', 'andrey_p4_check', false);
+    clearTimeout(wordTimer);
+    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 4. СИСТЕМА ДЕАКТИВИРОВАНА."), 15000);
 }
 
-function triggerAudioChain(w, i) {
-    if(i >= w.length) { 
-        addLine(">>> ПОВТОРИТЕ ПОСЛЕДОВАТЕЛЬНОСТЬ (ПРИМЕР: HLHH):", "gray"); 
-        ask('ВВОД СИГНАЛА:', 'phase4', false); 
-        clearTimeout(wordTimer); 
-        // При проигрыше по таймеру — вызываем Скрамблера
-        wordTimer = setTimeout(() => scramblerDie(), 5000); 
-        return; 
+async function displayEncryptedReports() {
+    clearTimeout(wordTimer);
+    await type(">>> ВСЕ ДЕПАРТАМЕНТСКИЕ ТЕСТЫ УСПЕШНО ПРОЙДЕНЫ.", "success");
+    await bar();
+    await type("=== ДОСТУПНЫЕ ДОКУМЕНТЫ АРХИВА ДЕПАРТАМЕНТА ===", "success");
+    
+    correctReportOption = Math.floor(Math.random() * 10) + 1; 
+    for (let i = 1; i <= 10; i++) {
+        if (i === correctReportOption) {
+            addLine(`[ ПУНКТ №${i} ] — ЗАШИФРОВАННЫЙ АРХИВ: [ WE-30 ]`, "gray");
+        } else {
+            addLine(`[ ПУНКТ №${i} ] — ЗАШИФРОВАННЫЙ АРХИВ: [ ### ]`, "gray");
+        }
+        await delay(50);
     }
-    const currentLetter = w[i].toUpperCase();
-    const frequency = currentLetter === "H" ? 1500 : 300;
-    playBeep(frequency, 'sine', 0.2); 
-    setTimeout(() => triggerAudioChain(w, i+1), 650);
-}
-async function startPhaseFive() {
-    step = 'phase5'; stage = 0;
-    addLine(">>> ЗВУКОВОЙ КАНАЛ СИНХРОНИЗИРОВАН.", "success"); await delay(600);
-    err("🚨 КРИТИЧЕСКИЙ DDOS-ШТОРМ! СЕРВЕР ПЕРЕГРУЖЕН! ФАЗА 5");
-    await type(">>> СКАНИРУЙТЕ БИНАРНЫЕ СТРОКИ И НАХОДИТЕ АНОМАЛИЮ!", "error"); nextPhaseFiveVirus();
-}
-function nextPhaseFiveVirus() {
-    if (stage >= 3) { startPhaseSix(); return; }
-    DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
-    let len = 8 + stage * 2;
-    let baseArr = Array.from({length: len}, () => Math.random() > 0.5 ? "1" : "0");
-    let normal = baseArr.join("");
-    let anomalyArr = [...baseArr];
-    for(let i = 0; i < 3; i++) { anomalyArr[i] = anomalyArr[i] === "1" ? "0" : "1"; }
-    let anomaly = anomalyArr.join("");
-    let anomalyIdx = Math.floor(Math.random() * 4); let lines = [];
-    for(let i=0; i<4; i++) {
-        if(i === anomalyIdx) lines.push(anomaly);
-        else lines.push(normal);
-    }
-    targetWord = (anomalyIdx + 1).toString(); addLine(`[ФАЗА 5 - ПОТОК ${stage + 1}/3] СКАНИРОВАНИЕ ПАКЕТОВ:`, "error");
-    for(let i=0; i<4; i++) addLine(`${i+1}: ${lines[i]}`, "gray");
-    ask('ВВЕДИТЕ НОМЕР АНОМАЛЬНОЙ СТРОКИ:', 'phase5', false);
-    clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТЕРМИНАЛ КРАШНУЛСЯ ПОД DDOS-УДАРОМ."), 5000);
-}
-async function startPhaseSix() {
-    step = 'phase6'; stage = 0;
-    addLine(">>> ПОТОКИ ДАННЫХ ОЧИЩЕНЫ ОТ ВИРУСОВ.", "success"); await delay(600);
-    err("🚨 СЕТЬ РАЗВАЛИВАЕТСЯ НА ЧАСТИ! ФИНАЛЬНАЯ МАРШРУТИЗАЦИЯ! ФАЗА 6");
-    await type(">>> ПРОВОДИТЕ ПАКЕТ СТРОГО ЧЕРЕЗ ОТКРЫТЫЕ УЗЛЫ СВЯЗИ!", "error"); nextPhaseSixRoute();
-}
-function nextPhaseSixRoute() {
-    if (stage >= 3) { endAllGamesSuccess(); return; }
-    let ok = Math.random() > 0.5 ? "A" : "B"; targetWord = ok;
-    addLine(`[ФАЗА 6 - ШЛЮЗ ${stage + 1}/3] АНАЛИЗ МАРШРУТОВ:`, "error");
-    addLine(`[МАРШРУТ А]: ` + (ok === "A" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "A" ? "success" : "error");
-    addLine(`[МАРШРУТ Б]: ` + (ok === "B" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "B" ? "success" : "error");
-    ask('ВЫБЕРИТЕ ОТКРЫТЫЙ МАРШРУТ (А / Б):', 'phase6', false);
-    clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ПАКЕТ СГОРЕЛ В РАЗОРВАННОЙ СЕТИ."), 3500);
-}
-
-// ОБНОВЛЕННЫЙ ФИНАЛ: ВЫДАЕТ ДАННЫЕ И РЕДИРЕКТИТ ПО ССЫЛКЕ
-async function endAllGamesSuccess() {
-    clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar();
-    await type(">>> ВСЕ 6 ФАЗ ОБХОДА ЗАВЕРШЕНЫ С ПОЛНЫМ ТРИУМФОМ!", "success");
-    await type(">>> КОРНЕВОЙ ДОСТУП ВЫРВАН. СЕТЬ ШТАБА АТЛАНТИСА ПОДАВЛЕНА.", "success");
-    await type(">>> НАЙДЕНЫ ГЛУБОКИЕ ЛОГИ BILL. ПАРОЛЬ ОТ АККАУНТА: " + CFG.PASS, "success");
-    await delay(1500);
-    await type(">>> ИНИЦИАЛИЗАЦИЯ ЗАЩИЩЕННОГО ПЕРЕНАПРАВЛЕНИЯ К СЕРВЕРУ...", "gray");
-    // Выдерживаем паузу в 3 секунды для атмосферы и редиректим на твою ссылку из конфига
-    await delay(3000); 
-    window.location.href = "https://docs.google.com/document/d/1m7fFUMd31Jf5VVfPutMKAH2W03n19hspUK0ad03lGb4/edit?usp=sharing"; // Твоя секретная ссылка (замени на любую свою внутри кавычек)
+    await type("========================================", "success");
+    ask('ВВЕДИТЕ НОМЕР ПУНКТА ДЛЯ ЗАГРУЗКИ АРХИВА:', 'select_report', false);
 }
 
 async function startKeyGame() {
-    step = 'game'; stage = 0;
-    await type(">>> ПОДКЛЮЧЕНИЕ К ЗАКРЫТОМУ КРИПТО-КАНАЛУ...", "success");
-    await type(">>> НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ ПОТОКОВ ДАННЫХ!", "gray"); await delay(500); nextStage();
+    step = 'game'; stage = 0; DOM.out.innerHTML = "";
+    await type(">>> ИНИЦИАЛИЗАЦИЯ КРИПТОГРАФИЧЕСКОГО АНАЛИЗАТОРА...", "gray");
+    for(let i=0; i<CRYPTO_KEYS.length; i++) { addLine(`КЛЮЧ №${i+1}: [ ЗАСЕКРЕЧЕНО // ТРЕБУЕТСЯ ДЕШИФРАЦИЯ ]`, "error"); }
+    await delay(500);
+    await type(">>> НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ И РАСШИФРОВКИ ПАКЕТОВ!", "gray"); nextStage();
 }
 function nextStage() {
     if (stage >= 3) { endKeyGame(); return; }
@@ -547,17 +474,41 @@ function nextStage() {
 }
 async function endKeyGame() {
     clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true; await bar();
-    await type(">>> РАСШИФРОВКА КЛЮЧЕЙ ЗАВЕРШЕНА.", "success");
-    await type(">>> ГЛАВНЫЙ КЛЮЧ К БАЗАМ ДАННЫХ: ATLANTIS111", "success"); await delay(3500); showEmployeeMenu();
+    await type(">>> ДЕШИФРАЦИЯ ЗАВЕРШЕНА! УСПЕШНЫЙ П ПЕРЕХВАТ ДАННЫХ:", "success");
+    await type("----------------------------------------", "gray");
+    for(let i = 0; i < CRYPTO_KEYS.length; i++) { addLine(`КЛЮЧ №${i + 1}: [ ${CRYPTO_KEYS[i]} ]`, "success"); }
+    await type("----------------------------------------", "gray");
+    await type("🚨 ВНИМАНИЕ: ЗАПИШИТЕ ИЛИ СФОТКАЙТЕ ЭТИ КЛЮЧИ СЕЙЧАС!", "error"); await type("ЭКРАН БУДЕТ ОЧИЩЕН ЧЕРЕЗ 8 СЕКУНД...", "gray");
+    setTimeout(() => { DOM.out.innerHTML = ""; showEmployeeMenu(); }, 8000);
 }
-async function showEmployeeMenu() {
-    await type("========================================", "gray");
-    await type("ДОБРО ПОЖАЛОВАТЬ, " + CFG.LOGIN.toUpperCase() + "!", "success");
-    await type("ВЫБЕРИТЕ ОПЦИЮ СИСТЕМЫ [1-2]:", "gray");
-    await type("1. ПОСМОТРЕТЬ КЛЮЧИ К БАЗАМ ДАННЫХ", "success");
-    await type("2. ВЫЙТИ ИЗ ТЕРМИНАЛА", "success");
-    await type("========================================", "gray");
-    ask('ВЫБЕРИТЕ ПУНКТ (1-2):', 'menu', false);
+async function startSpeedGame() { step = 'speed_game'; stage = 0; document.body.classList.add('alarm'); playBeep(220, 'sawtooth', 0.5); playBeep(180, 'sawtooth', 0.5); err("⚠️ CRITICAL SECURITY ALERT: FOREIGN IP DETECTED!"); await delay(600); await type(">>> АКТИВИРОВАНА СИСТЕМА ЭКСТРЕННОЙ БЛОКИРОВКИ БАЗЫ ДАННЫХ!", "error"); await type(">>> ИСКАЖЕНИЕ ТРАФИКА! ВВОДИТЕ СЛОВА СТРОГО ЗАДОМ НАПЕРЕД!", "error"); await delay(300); nextSpeedWord(); }
+function nextSpeedWord() { if (stage >= 3) { successSpeedGame(); return; } const words = ["OVERRIDE", "DECRYPT", "BYPASS", "INTRUDER", "EXPLOIT"]; const rawWord = words[Math.floor(Math.random() * words.length)]; targetWord = rawWord.split("").reverse().join(""); addLine(`[ФАЗА 1 - ЭТАП ${stage + 1}/3] ИСХОДНЫЙ КОД: ${rawWord}`, "error"); ask('ВВЕДИТЕ РЕВЕРС-КОД:', 'speed_game', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ПРЕВЫШЕНО ВРЕМЯ ОЖИДАНИЯ ФАЗЫ 1. ЛОКДАУН."), 6000); }
+async function successSpeedGame() { clearTimeout(wordTimer); document.body.classList.remove('alarm'); await type(">>> КОНТРАТАКА ОТРАЖЕНА! ЗАЩИТА БАЗЫ ДАННЫХ СЛОМАНА.", "success"); await delay(600); await type("[ШТАБ]: Узел связи перехвачен. Инициализация аудио-протокола...", "success"); await delay(1500); await type("[ШТАБ]: Ахх... ну да. Молодец, гуд... гуд...", "success"); await delay(1000); await type("[ШТАБ]: Признаться, я до последнего думал, что наши безопасники тебя отрубят. Но ты упрямый.", "success"); await delay(1200); await type("[ШТАБ]: Давай начистоту. Что конкретно ты хочешь здесь найти?", "success"); await delay(800); DOM.term.classList.add('shake'); playBeep(90, 'sawtooth', 0.6); playBeep(70, 'triangle', 0.6); setTimeout(() => DOM.term.classList.remove('shake'), 600); await type("[ШТАБ]: Ты сейчас ковыряешься в закрытом секторе и ОЧЕНЬ СИЛЬНО нам мешаешь! Для чего всё это?", "error"); await delay(2000); await type("[ШТАБ]: Впрочем, мне плевать на твои мотивы. Мы тебя запеленговали.", "success"); await delay(800); await type("[ШТАБ]: Перехожу на ручной протокол изоляции. Прощай, Агент.", "error"); await delay(1200); startPhaseTwo(); }
+async function startPhaseTwo() { step = 'phase2'; stage = 0; document.body.classList.add('alarm'); err("🚨 АВАРИЙНАЯ БЛОКИРОВКА СЕТЕВОГО ОКРУЖЕНИЯ! ФАЗА 2"); await delay(600); await type(">>> ШТАБ ИЗОЛИРУЕТ НАШ IP! П ПЕРЕХВАТЫВАЙТЕ КООРДИНАТЫ УЗЛОВ!", "error"); nextPhaseTwoNode(); }
+function nextPhaseTwoNode() { if (stage >= 4) { startPhaseThree(); return; } const letters = ["A", "B", "C", "D", "X", "Y"]; const numbers = ["1", "2", "3", "4", "5"]; targetWord = letters[Math.floor(Math.random() * letters.length)] + numbers[Math.floor(Math.random() * numbers.length)]; addLine(`[ФАЗА 2 - УЗЕЛ ${stage + 1}/4] КАНАЛ СВЯЗИ: МАТРИЦА ${targetWord}`, "error"); const timeLimit = 5000 - (stage * 1000); ask('ВВЕДИТЕ КООРДИНАТУ:', 'phase2', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 МАТРИЧНАЯ БЛОКИРОВКА ЗАВЕРШЕНА. ВЫ ОТКЛЮЧЕНЫ."), timeLimit); }
+async function startPhaseThree() { step = 'phase3'; stage = 0; addLine(">>> СЕТЕВОЙ КОНТУР ФАЗЫ 2 СТАБИЛИЗИРОВАН.", "success"); await delay(500); await type("[ШТАБ]: С-Система... потеряна... Запуск протокола ВЫЖИГАНИЯ ЯДРА...", "error"); await type("[ШТАБ]: Гори в аду, Агент.", "error"); await delay(800); err("🚨 ВНИМАНИЕ: ЗАПУЩЕН ПРОТОКОЛ ПОЛНОГО СТИРАНИЯ ЯДРА СЕРВЕРА! ФАЗА 3"); await delay(600); nextPhaseThreeNode(); }
+function nextPhaseThreeNode() { if (stage >= 3) { startPhaseFour(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let rd = Array.from({length: 3}, () => Math.floor(Math.random() * 10)); targetWord = rd.join(""); const d = addLine(`[ФАЗА 3 - КЛЮЧ ЯДРА ${stage + 1}/3] ЧАСТОТА: ` + targetWord, "success"); playBeep(900, 'sine', 0.1); setTimeout(() => { d.textContent = `[ФАЗА 3 - КЛЮЧ ЯДРА ${stage + 1}/3] ЧАСТОТА: [СКРЫТО]`; ask('ВВЕДИТЕ СИНХРО-ЧАСТОТУ:', 'phase3', false); }, 2500); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ЯДРО ВЫЖЖЕНО. ОПЕРАЦИЯ ПРОВАЛЕНА."), 6000); }
+async function startPhaseFour() { step = 'phase4'; stage = 0; addLine(">>> ЧАСТОТЫ ЯДРА ФАЗЫ 3 СИНХРОНИЗИРОВАНЫ.", "success"); await delay(600); err("🚨 АЛАРМ: ШТАБ ВКЛЮЧИЛ АУДИО-ГЛУШИЛКУ! ФАЗА 4"); await type(">>> ПОВТОРЯЙТЕ СЕРИИ СИГНАЛОВ КЛАВИШАМИ H (ВЫСОКИЙ) И L (НИЗКИЙ)!", "error"); nextPhaseFourAudio(); }
+function nextPhaseFourAudio() { if (stage >= 3) { startPhaseFive(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let seq = []; for(let i=0; i<3+stage; i++) { seq.push(Math.random() > 0.5 ? "H" : "L"); } targetWord = seq.join(""); addLine(`[ФАЗА 4 - СИГНАЛ ${stage + 1}/3] ВОСПРОИЗВЕДЕНИЕ...`, "error"); triggerAudioChain(targetWord, 0); }
+function triggerAudioChain(w, i) { if(i >= w.length) { addLine(">>> ПОВТОРИТЕ ПОСЛЕДОВАТЕЛЬНОСТЬ (ПРИМЕР: HLHH):", "gray"); ask('ВВОД СИГНАЛА:', 'phase4', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => scramblerDie(), 5000); return; } const currentLetter = w[i].toUpperCase(); const frequency = currentLetter === "H" ? 1500 : 300; playBeep(frequency, 'sine', 0.2); setTimeout(() => triggerAudioChain(w, i+1), 650); }
+async function startPhaseFive() { step = 'phase5'; stage = 0; addLine(">>> ЗВУКОВОЙ КАНАЛ СИНХРОНИЗИРОВАН.", "success"); await delay(600); err("🚨 КРИТИЧЕСКИЙ DDOS-ШТОРМ! СЕРВЕР ПЕРЕГРУЖЕН! ФАЗА 5"); await type(">>> СКАНИРУЙТЕ БИНАРНЫЕ СТРОКИ И НАХОДИТЕ АНОМАЛИЮ!", "error"); nextPhaseFiveVirus(); }
+function nextPhaseFiveVirus() { if (stage >= 3) { startPhaseSix(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let len = 8 + stage * 2; let baseArr = Array.from({length: len}, () => Math.random() > 0.5 ? "1" : "0"); let normal = baseArr.join(""); let anomalyArr = [...baseArr]; for(let i = 0; i < 3; i++) { anomalyArr[i] = anomalyArr[i] === "1" ? "0" : "1"; } let anomaly = anomalyArr.join(""); let anomalyIdx = Math.floor(Math.random() * 4); let lines = []; for(let i=0; i<4; i++) { if(i === anomalyIdx) lines.push(anomaly); else lines.push(normal); } targetWord = (anomalyIdx + 1).toString(); addLine(`[ФАЗА 5 - ПОТОК ${stage + 1}/3] СКАНИРОВАНИЕ ПАКЕТОВ:`, "error"); for(let i=0; i<4; i++) addLine(`${i+1}: ${lines[i]}`, "gray"); ask('ВВЕДИТЕ НОМЕР АНОМАЛЬНОЙ СТРОКИ:', 'phase5', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТЕРМИНАЛ КРАШНУЛСЯ ПОД DDOS-УДАРОМ."), 5000); }
+async function startPhaseSix() { step = 'phase6'; stage = 0; addLine(">>> ПОТОКИ ДАННЫХ ОЧИЩЕНЫ ОТ ВИРУСОВ.", "success"); await delay(600); err("🚨 СЕТЬ РАЗВАЛИВАЕТСЯ НА ЧАСТИ! ФИНАЛЬНАЯ МАРШРУТИЗАЦИЯ! ФАЗА 6"); await type(">>> ПРОВОДИТЕ ПАКЕТ СТРОГО ЧЕРЕЗ ОТКРЫТЫЕ УЗЛЫ СВЯЗИ!", "error"); nextPhaseSixRoute(); }
+function nextPhaseSixRoute() { if (stage >= 3) { endAllGamesSuccess(); return; } let ok = Math.random() > 0.5 ? "A" : "B"; targetWord = ok; addLine(`[ФАЗА 6 - ШЛЮЗ ${stage + 1}/3] АНАЛИЗ МАРШРУТОВ:`, "error"); addLine(`[МАРШРУТ А]: ` + (ok === "A" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "A" ? "success" : "error"); addLine(`[МАРШРУТ Б]: ` + (ok === "B" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "B" ? "success" : "error"); ask('ВВЕДИТЕ ОТКРЫТЫЙ МАРШРУТ (А / Б):', 'phase6', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ПАКЕТ СГОРЕЛ В РАЗОРВАННОЙ СЕТИ."), 3500); }
+
+async function endAllGamesSuccess() {
+    clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar();
+    await type(">>> ВСЕ 6 ФАЗ ОБХОДА ЗАВЕРШЕНЫ С ПОЛНЫМ ТРИУМФОМ!", "success");
+    await type(">>> КОРНЕВОЙ ДОСТУП ВЫРВАН. СЕТЬ ШТАБА АТЛАНТИСА ПОДАВЛЕНА.", "success");
+    await type("===================================================", "gray");
+    await type(">>> НАЙДЕНЫ ПАРОЛИ К СЛЕД. ДЕПАРТАМЕНТАМ:", "success");
+    await type("Департамент L.a.S 368", "success");
+    await type("Департамент T.F.B 868", "success");
+    await type("===================================================", "gray");
+    await delay(2500);
+    await type(">>> ИНИЦИАЛИЗАЦИЯ ЗАЩИЩЕННОГО ПЕРЕНАПРАВЛЕНИЯ К СЕРВЕРУ...", "gray");
+    await delay(3000); 
+    window.location.href = "https://docs.google.com/document/d/1m7fFUMd31Jf5VVfPutMKAH2W03n19hspUK0ad03lGb4/edit?usp=sharing";
 }
 DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
 DOM.inp.onkeydown = async (e) => {
@@ -565,63 +516,89 @@ DOM.inp.onkeydown = async (e) => {
     if (step === 'game') { clearInterval(gameInterval); playBeep(900, 'square', 0.1); addLine(">>> УЗЕЛ СЕГМЕНТА ЗАФИКСИРОВАН.", "success"); stage++; await delay(400); nextStage(); return; }
     const v = DOM.inp.value, cv = v.trim(); if (!v) return;
 
-    if (cv.toLowerCase() === 'skip1' && step === 'speed_game') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 1", "success"); successSpeedGame(); return; }
-    if (cv.toLowerCase() === 'skip2' && step === 'phase2') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 2", "success"); startPhaseThree(); return; }
-    if (cv.toLowerCase() === 'skip3' && step === 'phase3') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 3", "success"); startPhaseFour(); return; }
-    if (cv.toLowerCase() === 'skip4' && step === 'phase4') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 4", "success"); startPhaseFive(); return; }
-    if (cv.toLowerCase() === 'skip5' && step === 'phase5') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 5", "success"); startPhaseSix(); return; }
-    if (cv.toLowerCase() === 'skip6' && step === 'phase6') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ПОЛНЫЙ ВЗЛОМ", "success"); endAllGamesSuccess(); return; }
+    if (step === 'speed_game' && cv.toLowerCase() === 'skipall') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.3); addLine(">>> MASTER CHEAT ACTIVE: SKIPPING ALL 6 PHASES!", "success"); endAllGamesSuccess(); return; }
 
-    if (step === 'speed_game') {
-        if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> СЕГМЕНТ ОБХОДА СТАБИЛИЗИРОВАН.", "success"); stage++; await delay(400); nextSpeedWord(); }
-        else die("КРИТИЧЕСКАЯ ОШИБКА ВВОДА! СИСТЕМА УНИЧТОЖЕНА."); return;
+    if (step === 'speed_game' || step === 'phase2' || step === 'phase3' || step === 'phase4' || step === 'phase5' || step === 'phase6') {
+        if (cv.toLowerCase() === 'skip1' && step === 'speed_game') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 1", "success"); successSpeedGame(); return; }
+        if (cv.toLowerCase() === 'skip2' && step === 'phase2') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 2", "success"); startPhaseThree(); return; }
+        if (cv.toLowerCase() === 'skip3' && step === 'phase3') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 3", "success"); startPhaseFour(); return; }
+        if (cv.toLowerCase() === 'skip4' && step === 'phase4') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 4", "success"); startPhaseFive(); return; }
+        if (cv.toLowerCase() === 'skip5' && step === 'phase5') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 5", "success"); startPhaseSix(); return; }
+        if (cv.toLowerCase() === 'skip6' && step === 'phase6') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ПОЛНЫЙ ВЗЛОМ", "success"); endAllGamesSuccess(); return; }
+
+        if (step === 'speed_game') { if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> СЕГМЕНТ ОБХОДА СТАБИЛИЗИРОВАН.", "success"); stage++; await delay(400); nextSpeedWord(); } else die("ОШИБКА!"); return; }
+        if (step === 'phase2') { if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> КОНТУР УЗЛА ПЕРЕХВАЧЕН И ПЕРЕНАПРАВЛЕН.", "success"); stage++; await delay(400); nextPhaseTwoNode(); } else die("ОШИБКА!"); return; }
+        if (step === 'phase3') { if (cv === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> РЕЗОНАТОР ЯДРА СИНХРОНИЗИРОВАН.", "success"); stage++; await delay(400); nextPhaseThreeNode(); } else die("ОШИБКА!"); return; }
+        if (step === 'phase4') { if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> ЧАСТОТНЫЙ ФИЛЬТР НАСТРОЕН.", "success"); stage++; await delay(400); nextPhaseFourAudio(); } else { await scramblerDie(); } return; }
+        if (step === 'phase5') { if (cv === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> АНОМАЛЬНЫЙ ПОТОК ФИЛЬТРОВАН.", "success"); stage++; await delay(400); nextPhaseFiveVirus(); } else die("ОШИБКА!"); return; }
+        if (step === 'phase6') { let chk = cv.toUpperCase() === "A" || cv.toUpperCase() === "А" ? "A" : (cv.toUpperCase() === "B" || cv.toUpperCase() === "Б" ? "B" : ""); if (chk === targetWord) { stage++; playBeep(900, 'square', 0.1); addLine(">>> ШЛЮЗ ПРОЙДЕН. ПАКЕТ ДВИЖЕТСЯ ДАЛЬШЕ.", "success"); stage++; await delay(400); nextPhaseSixRoute(); } else die("ОШИБКА!"); return; }
     }
-    if (step === 'phase2') {
-        if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> КОНТУР УЗЛА ПЕРЕХВАЧЕН И ПЕРЕНАПРАВЛЕН.", "success"); stage++; await delay(400); nextPhaseTwoNode(); }
-        else die("СИНХРОНИЗАЦИЯ СОРВАНА! ШТАБ ПЕРЕХВАТИЛ СЕССИЮ."); return;
-    }
-    if (step === 'phase3') {
-        if (cv === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> РЕЗОНАТОР ЯДРА СИНХРОНИЗИРОВАН.", "success"); stage++; await delay(400); nextPhaseThreeNode(); }
-        else die("КОД НЕ СОВПАЛ! ЯДРО ПЕРЕГРЕЛОСЬ И ВСПЫХНУЛО."); return;
-    }
-       if (step === 'phase4') {
-        if (cv.toUpperCase() === targetWord) { 
-            clearTimeout(wordTimer); 
-            playBeep(900, 'square', 0.1); 
-            addLine(">>> ЧАСТОТНЫЙ ФИЛЬТР НАСТРОЕН.", "success"); 
-            stage++; 
-            await delay(400); 
-            nextPhaseFourAudio(); 
-        } else { 
-            // Вместо старого die() теперь вызываем Скрамблера при ошибке ввода
-            await scramblerDie(); 
-        } 
-        return;
-    }
-    if (step === 'phase5') {
-        if (cv === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> АНОМАЛЬНЫЙ ПОТОК ФИЛЬТРОВАН.", "success"); stage++; await delay(400); nextPhaseFiveVirus(); }
-        else die("ВВЕДЕН НЕ ТОТ ПОТОК! DDOS СМЁС СИСТЕМУ."); return;
-    }
-    if (step === 'phase6') {
-        let chk = cv.toUpperCase() === "A" || cv.toUpperCase() === "А" ? "A" : (cv.toUpperCase() === "B" || cv.toUpperCase() === "Б" ? "B" : "");
-        if (chk === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> ШЛЮЗ ПРОЙДЕН. ПАКЕТ ДВИЖЕТСЯ ДАЛЬШЕ.", "success"); stage++; await delay(400); nextPhaseSixRoute(); }
-        else die("ПАКЕТ НАПРАВЛЕН В МЕРТВЫЙ ШЛЮЗ И УНИЧТОЖЕН."); return;
-    }
+
     DOM.blk.classList.remove('active'); DOM.inp.disabled = true; addLine(DOM.pr.textContent + " " + (isMask ? "*".repeat(v.length) : cv), 'success'); await delay(300);
+    
     if (step === 'login') {
-        if (cv.toLowerCase() === 'base') { ask('ENTER DATABASE KEY:', 'base_key', true); }
-        else if (cv.toLowerCase() === CFG.LOGIN) ask('ENTER PASSKEY:', 'pass', true);
+        const inputLogin = cv.toLowerCase();
+        if (inputLogin === 'base') { ask('ENTER DATABASE KEY:', 'base_key', true); }
+        else if (CFG.USERS[inputLogin] !== undefined) { currentUser = inputLogin; ask('ENTER PASSKEY:', 'pass', true); }
         else { err("DENIED: UNKNOWN ID."); await delay(1000); ask('AGENT ID / EMPLOYEE:', 'login', false); }
     } else if (step === 'base_key') {
         if (cv === 'ATLANTIS111') startSpeedGame();
-        else { err("ACCESS DENIED: INVALID DATABASE KEY."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
+        else { err("ACCESS DENIED."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
     } else if (step === 'pass') {
-        if (cv === CFG.PASS) { await bar(); showEmployeeMenu(); }
-        else { err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
+        if (cv === CFG.USERS[currentUser]) { await bar(); showEmployeeMenu(); }
+        else { err("SECURITY VIOLATION."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
     } else if (step === 'menu') {
         if (cv === '1') { startKeyGame(); } 
-        else if (cv === '2') { await type(">>> ОТКЛЮЧЕНИЕ...", "gray"); await delay(1000); ask('AGENT ID / EMPLOYEE:', 'login', false); }
-        else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); ask('ВЫБЕРИТЕ ПУНКТ (1-2):', 'menu', false); }
+        else if (cv === '2') { startAndreyPhase1(); } 
+        else if (cv === '3') { DOM.out.innerHTML = ""; showContractorsDepartmentMenu(); } // Подменю
+        else if (cv === '4') { await type(">>> ОТКЛЮЧЕНИЕ...", "gray"); await delay(1000); DOM.out.innerHTML = ""; ask('AGENT ID / EMPLOYEE:', 'login', false); }
+        else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); ask('ВЫБЕРИТЕ ПУНКТ (1-4):', 'menu', false); }
+    } 
+    // Логика подменю контрактников
+    else if (step === 'contractors_menu') {
+        if (cv === '1') { ask('ВВЕДИТЕ ТОКЕН ДОСТУПА L.a.S:', 'check_las_pass', true); }
+        else if (cv === '2') { ask('ВВЕДИТЕ ТОКЕН ДОСТУПА T.F.B:', 'check_tfb_pass', true); }
+        else { DOM.out.innerHTML = ""; showEmployeeMenu(); }
+    }
+    // Проверки паролей подразделов
+    else if (step === 'check_las_pass') {
+        if (cv === '368') {
+            await type(">>> ТОКЕН СЕТИ ВЕРИФИЦИРОВАН. ДОСТУП ПРЕДОСТАВЛЕН.", "success"); await bar();
+            window.location.href = "https://colmix2.github.io/ConsoleLAS/";
+        } else {
+            err("🚨 ОШИБКА ДОСТУПА: НЕВЕРНЫЙ КОРНЕВОЙ ТОКЕН L.a.S"); await delay(1500); DOM.out.innerHTML = ""; showContractorsDepartmentMenu();
+        }
+    }
+    else if (step === 'check_tfb_pass') {
+        if (cv === '868') {
+            await type(">>> ТОКЕН СЕТИ ВЕРИФИЦИРОВАН. ДОСТУП ПРЕДОСТАВЛЕН.", "success"); await bar();
+            window.location.href = "https://google.com";
+        } else {
+            err("🚨 ОШИБКА ДОСТУПА: НЕВЕРНЫЙ КОРНЕВОЙ ТОКЕН T.F.B"); await delay(1500); DOM.out.innerHTML = ""; showContractorsDepartmentMenu();
+        }
+    }
+    // Основные проверки фаз Андрея
+    else if (step === 'andrey_p1_check') {
+        if (cv === targetWord) { startAndreyPhase2(); } 
+        else { die("🚨 СДВИГ ИМПУЛЬСА НЕВЕРЕН. СЕТЕВОЙ ШЛЮЗ ЗАБЛОКИРОВАН."); }
+    } else if (step === 'andrey_p2_check') {
+        if (cv.toUpperCase() === targetWord) { startAndreyPhase3(); } 
+        else { die("🚨 ОШИБКА ДЕТЕКЦИИ СЛЕПОГО ПЯТНА. СЕССИЯ АННУЛИРОВАНА."); }
+    } else if (step === 'andrey_p3_check') {
+        if (cv === targetWord) { startAndreyPhase4(); } 
+        else { die("🚨 АКУСТИЧЕСКИЙ ПОДГЛЯДЫВАТЕЛЬ ОБНАРУЖЕН. БЛОКИРОВКА."); }
+    } 
+    else if (step === 'andrey_p4_check') {
+        if (cv.toUpperCase() === targetWord) { await displayEncryptedReports(); } 
+        else { die("🚨 КОД ШИФРАТОРА НЕ СОВПАЛ. ДОСТУП В АРХИВ ОКОНЧАТЕЛЬНО ЗАКРЫТ."); }
+    }
+    else if (step === 'select_report') {
+        if (cv === correctReportOption.toString()) {
+            await type(">>> ИДЕНТИФИКАЦИЯ АРХИВА... УСПЕШНО.", "success"); await bar();
+            window.location.href = "https://docs.google.com/document/d/18EhokVTN-Q_rSTQhXzz0q3Df6yPx3CbmjVcPwfMNVIo/edit?usp=sharing";
+        } else {
+            err("🚨 КРИТИЧЕСКАЯ ОШИБКА: ДАННЫЙ АРХИВ ЗАБЛОКИРОВАН ИЛИ ПОВРЕЖДЕН."); await delay(1500); showEmployeeMenu();
+        }
     }
 };
 document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); window.onload = runBootLogs;
