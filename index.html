@@ -45,11 +45,10 @@
         </div>
     </div>
 </div>
-
 <script>
 const CFG = { LOGIN: "bill", PASS: "324", SPD: 15 };
 const DOM = { term: document.getElementById('term'), inp: document.getElementById('inp'), view: document.getElementById('view'), out: document.getElementById('out'), pr: document.getElementById('pr'), blk: document.getElementById('blk') };
-let step = 'login', isMask = false, gameInterval = null, stage = 0;
+let step = 'login', isMask = false, gameInterval = null, stage = 0, isKeyGame = false;
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
 function playBeep(f, t, d) {
@@ -100,9 +99,9 @@ async function bar() {
         await delay(40); 
     }
 }
-
-async function startMiniGame() {
-    step = 'game'; stage = 0;
+<script>
+async function startMiniGame(keyMode = false) {
+    step = 'game'; stage = 0; isKeyGame = keyMode;
     await type(">>> ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ДЕШИФРОВКИ...", "success");
     await type(">>> ИНСТРУКЦИЯ: НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ ПРИ СТАБИЛИЗАЦИИ!", "gray");
     await delay(500); 
@@ -111,15 +110,15 @@ async function startMiniGame() {
 
 function nextStage() {
     if (stage >= 3) { 
-        endMiniGame(); 
+        if (isKeyGame) endKeyGame(); else endMiniGame(); 
         return; 
     }
-    const st = ["CONNECTING TO DATABASE...", "OVERRIDING SECURITY...", "EXTRACTING HASHES..."];
+    const st = isKeyGame ? ["OPENING SECURE CRYPTO CHANNEL...", "DECRYPTING KEY STREAMS...", "PARSING BASE CODES..."] : ["CONNECTING TO DATABASE...", "OVERRIDING SECURITY...", "EXTRACTING HASHES..."];
     addLine(st[stage], "success"); 
     const d = addLine("", "gray");
     gameInterval = setInterval(() => {
         let ch = "0123456789ABCDEFXYZ!@#%", hex = Array.from({length: 8}, () => ch[Math.floor(Math.random() * ch.length)]).join("");
-        d.textContent = `[BRUTEFORCE FLOW #${stage + 1}]: ` + hex; 
+        d.textContent = (isKeyGame ? `[DECRYPT KEY FLOW #${stage + 1}]: ` : `[BRUTEFORCE FLOW #${stage + 1}]: `) + hex; 
         playBeep(400, 'sine', 0.005);
     }, 60);
     DOM.inp.disabled = false; 
@@ -128,14 +127,32 @@ function nextStage() {
 }
 
 async function endMiniGame() {
-    clearInterval(gameInterval); 
-    DOM.blk.classList.remove('active'); 
-    DOM.inp.disabled = true;
+    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
     await bar();
     await type(">>> УСПЕХ! БАЗА ДАННЫХ СКОМПРОМЕТИРОВАНА.", "success");
     await type(">>> НАЙДЕНЫ ЛОГИ СОТРУДНИКА BILL. КЛЮЧ: " + CFG.PASS, "success");
     await delay(2000); 
     ask('AGENT ID / EMPLOYEE:', 'login', false);
+}
+
+async function endKeyGame() {
+    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
+    await bar();
+    await type(">>> РАСШИФРОВКА КЛЮЧЕЙ ЗАВЕРШЕНА.", "success");
+    await type(">>> ГЛАВНЫЙ КЛЮЧ К БАЗАМ ДАННЫХ: ATLANTIS111", "success");
+    await delay(2500);
+    showEmployeeMenu();
+}
+
+async function showEmployeeMenu() {
+    await type("========================================", "gray");
+    await type("ДОБРО ПОЖАЛОВАТЬ, " + CFG.LOGIN.toUpperCase() + "!", "success");
+    await type("ВЫБЕРИТЕ ОПЦИЮ СИСТЕМЫ [1-3]:", "gray");
+    await type("1. ПОСМОТРЕТЬ КЛЮЧИ К БАЗАМ ДАННЫХ", "success");
+    await type("2. СТАТУС СЕТЕВОГО ОКРУЖЕНИЯ", "success");
+    await type("3. ВЫЙТИ ИЗ СИСТЕМЫ", "success");
+    await type("========================================", "gray");
+    ask('ВЫБЕРИТЕ ПУНКТ (1-3):', 'menu', false);
 }
 
 DOM.inp.oninput = () => { 
@@ -165,7 +182,7 @@ DOM.inp.onkeydown = async (e) => {
     
     if (step === 'login') {
         if (cv.toLowerCase() === 'base') {
-            startMiniGame();
+            startMiniGame(false);
         } else if (cv.toLowerCase() === CFG.LOGIN) {
             ask('ENTER PASSKEY:', 'pass', true);
         } else { 
@@ -176,12 +193,27 @@ DOM.inp.onkeydown = async (e) => {
     } else if (step === 'pass') {
         if (cv === CFG.PASS) { 
             await bar(); 
-            await type("ДОБРО ПОЖАЛОВАТЬ, " + CFG.LOGIN.toUpperCase(), "success"); 
-            await type("ДОСТУП ОТКРЫТ. КОНЕЦ СВЯЗИ.", "success"); 
+            showEmployeeMenu();
         } else { 
             err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); 
             await delay(1500); 
             ask('AGENT ID / EMPLOYEE:', 'login', false); 
+        }
+    } else if (step === 'menu') {
+        if (cv === '1') {
+            startMiniGame(true);
+        } else if (cv === '2') {
+            await type(">>> СТАТУС СЕТИ: СТАТИЧНЫЙ. ВСЕ УЗЛЫ СТАБИЛЬНЫ.", "gray");
+            await delay(1000);
+            showEmployeeMenu();
+        } else if (cv === '3') {
+            await type(">>> ВЫХОД ИЗ СИСТЕМЫ...", "gray");
+            await delay(1000);
+            ask('AGENT ID / EMPLOYEE:', 'login', false);
+        } else {
+            err("ОШИБКА: НЕВЕРНЫЙ ВЫБОР. ВВЕДИТЕ ЧИСЛО ОТ 1 ДО 3.");
+            await delay(1000);
+            ask('ВЫБЕРИТЕ ПУНКТ (1-3):', 'menu', false);
         }
     }
 };
