@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P.M.C Atlantis - Secure Terminal</title>
+    <title>ATLANTIS // STEALTH NET TERMINAL</title>
     <style>
         :root {
-            --glow-color: rgba(26, 255, 36, 0.4);
-            --text-color: #1aff24;
-            --bg-color: #030703;
-            --accent-color: #88ff88;
-            --error-color: #ff3333;
-            --error-glow: rgba(255, 51, 51, 0.5);
-            --success-color: #33ffff;
-            --success-glow: rgba(51, 255, 255, 0.5);
+            --glow-color: rgba(0, 255, 65, 0.35);
+            --text-color: #00ff41;
+            --bg-color: #010502;
+            --accent-color: #55ff55;
+            --error-color: #ff1111;
+            --error-glow: rgba(255, 17, 17, 0.5);
+            --success-color: #00ffff;
+            --success-glow: rgba(0, 255, 255, 0.5);
         }
 
         * {
@@ -24,17 +24,18 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             font-family: 'Courier New', Courier, monospace;
-            padding: 30px;
+            padding: 40px 30px;
             margin: 0;
             min-height: 100vh;
             overflow-x: hidden;
-            text-shadow: 0 0 6px var(--glow-color);
+            text-shadow: 0 0 4px var(--glow-color);
         }
 
+        /* Эффект мерцания ЭЛТ */
         @keyframes flicker {
-            0% { opacity: 0.98; }
+            0% { opacity: 0.97; }
             50% { opacity: 1; }
-            100% { opacity: 0.99; }
+            100% { opacity: 0.98; }
         }
 
         body::before {
@@ -42,12 +43,12 @@
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             z-index: 9999;
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
-            animation: flicker 0.15s infinite;
+            animation: flicker 0.2s infinite;
         }
 
         body::after {
@@ -55,43 +56,26 @@
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.85) 100%);
             z-index: 10000;
             pointer-events: none;
         }
 
         .terminal {
-            max-width: 900px;
+            max-width: 850px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
         }
 
-        .logo-wrapper {
-            width: 180px;
-            height: 180px;
-            margin: 0 auto 20px auto;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .terminal-logo {
-            display: block;
-            width: 100%;
-            height: auto;
-            position: absolute;
-            left: -180px;
-            filter: drop-shadow(180px 0 0 var(--text-color)) drop-shadow(180px 0 10px var(--glow-color));
-            opacity: 0.9;
-        }
-
         .header-text {
             color: var(--accent-color);
-            border-bottom: 1px dashed var(--text-color);
+            border-bottom: 2px double var(--text-color);
             padding-bottom: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             white-space: pre-wrap;
-            text-align: center;
+            font-weight: bold;
+            letter-spacing: 1px;
         }
 
         .output-container {
@@ -101,9 +85,9 @@
 
         .output-line {
             white-space: pre-wrap;
-            line-height: 1.6;
+            line-height: 1.5;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             word-break: break-all;
         }
 
@@ -130,12 +114,13 @@
             font-weight: bold;
             outline: none;
             flex-grow: 1;
-            text-shadow: 0 0 6px var(--glow-color);
+            text-shadow: 0 0 4px var(--glow-color);
         }
 
         .error-msg {
             color: var(--error-color);
             text-shadow: 0 0 6px var(--error-glow);
+            font-weight: bold;
         }
 
         .success-msg {
@@ -152,20 +137,15 @@
 <body>
 
 <div class="terminal">
-    <div class="logo-wrapper">
-        <!-- Альтернативный текст убран, чтобы при ошибке загрузки ничего лишнего не рисовалось -->
-        <img id="logoImg" class="terminal-logo" src="">
-    </div>
-
-    <div class="header-text">===================================================================
-  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v5.50
-  WARNING: AUTHORIZED MILITARY PERSONNEL ONLY
-===================================================================</div>
+    <div class="header-text">======================================================================
+  P.M.C. "ATLANTIS" // INFILTRATION & STEALTH OPERATIONS NETWORK
+  SECURE NODAL TERMINAL v6.0.0-ALPHA // LEVEL 5 SECURITY OVERLAY
+======================================================================</div>
     
     <div class="output-container" id="output"></div>
 
     <div class="input-line">
-        <span class="prompt" id="prompt">ENTER OPERATOR ID:</span>
+        <span class="prompt" id="prompt">ENTER AGENT ID:</span>
         <input type="text" id="commandInput" autofocus autocomplete="off">
     </div>
 </div>
@@ -175,20 +155,14 @@
         LOGIN: "Bill",
         PASSWORD: "324",
         SECRET_URL: "https://google.com",
-        TYPE_SPEED: 15,
-        // Ипользуем прямую внешнюю ссылку на загруженный прозрачный логотип
-        LOGO_FILE: "https://postimg.cc" 
+        TYPE_SPEED: 8 // Быстрая печать для более боевого вида
     };
 
     const DOM = {
         input: document.getElementById('commandInput'),
         output: document.getElementById('output'),
-        prompt: document.getElementById('prompt'),
-        logo: document.getElementById('logoImg')
+        prompt: document.getElementById('prompt')
     };
-
-    // Устанавливаем прямую ссылку на картинку
-    DOM.logo.src = CONFIG.LOGO_FILE;
 
     let currentStep = 'login'; 
 
@@ -200,6 +174,7 @@
         const line = document.createElement('div');
         line.className = `output-line ${className}`;
         DOM.output.appendChild(line);
+        window.scrollTo(0, document.body.scrollHeight);
         return line;
     }
 
@@ -211,7 +186,6 @@
             if (i < text.length) {
                 line.textContent += text.charAt(i);
                 i++;
-                window.scrollTo(0, document.body.scrollHeight);
                 setTimeout(printChar, CONFIG.TYPE_SPEED);
             } else if (callback) {
                 callback();
@@ -220,10 +194,33 @@
         printChar();
     }
 
+    // Имитация прогресс-бара для шпионского взлома/дешифровки
+    function showProgressBar(callback) {
+        const line = createLine('', 'success-msg');
+        let percent = 0;
+        
+        function updateBar() {
+            if (percent <= 100) {
+                const size = 20; // Длина полосы
+                const filled = Math.floor((percent / 100) * size);
+                const empty = size - filled;
+                const bar = '█'.repeat(filled) + '░'.repeat(empty);
+                line.textContent = `DECRYPTING STEALTH ARCHIVE: [${bar}] ${percent}%`;
+                percent += 4;
+                setTimeout(updateBar, 40);
+            } else {
+                if (callback) callback();
+            }
+        }
+        updateBar();
+    }
+
+    // Тексты в стиле скрытной кибер-разведки
     const introLines = [
-        "INITIALIZING CLIENT DECRYPTION MODULE... [OK]",
-        "CONNECTING TO CENTRAL DATABASE... [CONNECTED]",
-        "\nACCESS RESTRICTED. IP RECORDED. INTERCEPT PROTOCOL ACTIVE.\n"
+        "SYS: BOOTING QUANTUM DECRYPTION CORES...",
+        "SYS: ESTABLISHING REVERSE PROXY VIA ONION-OVERLAY... [TUNNEL STABLE]",
+        "SYS: ANTI-CYBER ATTACK PARANOIA PROTOCOL (CAPP v9) IS ACTIVE.",
+        "SYS: PACKET INJECTION COMPLETED. STANDING BY FOR AGENT AUTHENTICATION.\n"
     ];
 
     function playIntro(index = 0) {
@@ -235,6 +232,7 @@
         }
     }
 
+    // Старт
     DOM.input.disabled = true;
     playIntro();
 
@@ -246,11 +244,11 @@
         if (!value) return;
 
         if (currentStep === 'login') {
-            createLine(`ENTER OPERATOR ID: ${value}`, 'user-input');
+            createLine(`ENTER AGENT ID: ${value}`, 'user-input');
 
             if (value.toLowerCase() === CONFIG.LOGIN.toLowerCase()) {
                 DOM.input.disabled = true;
-                typeText("\n[SUCCESS] Идентификатор подтвержден. Проверка уровня допуска...", 'success-msg', () => {
+                typeText("\n[OK] ИДЕНТИФИКАТОР АГЕНТА НАЙДЕН В СЕТИ. ПРОВЕРКА КРИПТО-ПОДПИСИ...", 'success-msg', () => {
                     currentStep = 'password';
                     DOM.prompt.textContent = 'ENTER CRYPTO-KEY:';
                     DOM.input.type = 'password';
@@ -268,10 +266,14 @@
                 DOM.input.disabled = true;
                 DOM.input.blur();
                 
-                typeText("\n[ACCESS GRANTED] Доступ к БД P.M.C \"Atlantis\" разрешен. Извлечение архивов...", 'success-msg', () => {
-                    setTimeout(() => {
-                        window.location.href = CONFIG.SECRET_URL;
-                    }, 1000);
+                typeText("\n[ACCESS GRANTED] ДОСТУП К ОПЕРАТИВНОЙ БАЗЕ ДАННЫХ РАЗРЕШЕН.\n", 'success-msg', () => {
+                    showProgressBar(() => {
+                        typeText("\nСКАЧИВАНИЕ ДОКУМЕНТОВ ИЗ КОМПЛЕКСА ЗАВЕРШЕНО. ПЕРЕНАПРАВЛЕНИЕ НА ЗАЩИЩЕННЫЙ КАНАЛ...", 'success-msg', () => {
+                            setTimeout(() => {
+                                window.location.href = CONFIG.SECRET_URL;
+                            }, 1200);
+                        });
+                    });
                 });
             } else {
                 triggerError();
@@ -281,12 +283,15 @@
 
     function triggerError() {
         DOM.input.disabled = true;
-        typeText("\n[CRITICAL ERROR] ОТКАЗ В ДОСТУПЕ. Нарушение периметра безопасности. Попытка заблокирована.\n", 'error-msg', () => {
+        typeText("\n[WARNING] ОТКАЗ В ДОСТУПЕ. ЗАПУСКАЮ СКРЫТИЕ СЛЕДОВ ТРАФИКА ДЛЯ ХОСТА...\n", 'error-msg', () => {
             currentStep = 'login';
-            DOM.prompt.textContent = 'ENTER OPERATOR ID:';
+            DOM.prompt.textContent = 'ENTER AGENT ID:';
             DOM.input.type = 'text';
             DOM.input.disabled = false;
             DOM.input.focus();
         });
     }
 </script>
+
+</body>
+</html>
