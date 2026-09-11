@@ -3,17 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>P.M.C Atlantis - Terminal</title>
+    <title>P.M.C Atlantis - Secure Terminal</title>
     <style>
-        /* Общие настройки футуристичного терминала */
+        :root {
+            --glow-color: rgba(26, 255, 36, 0.4);
+            --text-color: #1aff24;
+            --bg-color: #030703;
+            --accent-color: #88ff88;
+            --error-color: #ff3333;
+            --error-glow: rgba(255, 51, 51, 0.5);
+            --success-color: #33ffff;
+            --success-glow: rgba(51, 255, 255, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #050b06;
-            color: #1aff24;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Courier New', Courier, monospace;
             padding: 30px;
             margin: 0;
+            min-height: 100vh;
             overflow-x: hidden;
-            text-shadow: 0 0 4px rgba(26, 255, 36, 0.5);
+            text-shadow: 0 0 6px var(--glow-color);
+        }
+
+        /* Эффект мерцания экрана ЭЛТ */
+        @keyframes flicker {
+            0% { opacity: 0.98; }
+            50% { opacity: 1; }
+            100% { opacity: 0.99; }
         }
 
         /* Эффект старого ЭЛТ-монитора (сканирующие линии) */
@@ -22,10 +44,12 @@
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04));
+            z-index: 9999;
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
+            animation: flicker 0.15s infinite;
         }
 
         /* Виньетка (затемнение по углам экрана) */
@@ -34,31 +58,37 @@
             display: block;
             position: fixed;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.6) 100%);
-            z-index: 3;
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.8) 100%);
+            z-index: 10000;
             pointer-events: none;
         }
 
         .terminal {
             max-width: 900px;
             margin: 0 auto;
-            position: relative;
-            z-index: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Текст шапки */
         .header-text {
-            color: #88ff88;
-            border-bottom: 1px dashed #1aff24;
+            color: var(--accent-color);
+            border-bottom: 1px dashed var(--text-color);
             padding-bottom: 15px;
             margin-bottom: 20px;
+            white-space: pre-wrap;
         }
 
-        .output {
+        .output-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-line {
             white-space: pre-wrap;
-            margin-bottom: 15px;
-            line-height: 1.5;
+            line-height: 1.6;
             letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            word-break: break-all;
         }
 
         .input-line {
@@ -71,47 +101,48 @@
             margin-right: 12px;
             user-select: none;
             font-weight: bold;
-            color: #88ff88;
+            color: var(--accent-color);
+            white-space: nowrap;
         }
 
         input {
             background: transparent;
             border: none;
-            color: #1aff24;
+            color: var(--text-color);
             font-family: 'Courier New', Courier, monospace;
             font-size: 16px;
             font-weight: bold;
             outline: none;
             flex-grow: 1;
-            text-shadow: 0 0 4px rgba(26, 255, 36, 0.5);
+            text-shadow: 0 0 6px var(--glow-color);
         }
 
-        /* Ошибки подсвечиваем тревожным красным */
+        /* Стили кастомных классов */
         .error-msg {
-            color: #ff3333;
-            text-shadow: 0 0 4px rgba(255, 51, 51, 0.5);
+            color: var(--error-color);
+            text-shadow: 0 0 6px var(--error-glow);
         }
 
-        /* Успех подсвечиваем ярким зеленым */
         .success-msg {
-            color: #33ffff;
-            text-shadow: 0 0 4px rgba(51, 255, 255, 0.5);
+            color: var(--success-color);
+            text-shadow: 0 0 6px var(--success-glow);
+        }
+
+        .user-input {
+            color: #ffffff;
+            text-shadow: 0 0 6px rgba(255,255,255,0.6);
         }
     </style>
 </head>
 <body>
 
 <div class="terminal">
-    <div class="header-text">
-===================================================================
-  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v4.82
+    <div class="header-text">===================================================================
+  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v5.00
   WARNING: AUTHORIZED MILITARY PERSONNEL ONLY
 ===================================================================</div>
     
-    <div class="output" id="output">INITIALIZING CLIENT DECRYPTION MODULE... [OK]
-CONNECTING TO CENTRAL DATABASE... [CONNECTED]
-
-ACCESS RESTRICTED. IP RECORDED. INTERCEPT PROTOCOL ACTIVE.</div>
+    <div class="output-container" id="output"></div>
 
     <div class="input-line">
         <span class="prompt" id="prompt">ENTER OPERATOR ID:</span>
@@ -120,73 +151,125 @@ ACCESS RESTRICTED. IP RECORDED. INTERCEPT PROTOCOL ACTIVE.</div>
 </div>
 
 <script>
-    // НАСТРОЙКИ ДОСТУПА
-    const CORRECT_LOGIN = "Bill";
-    const CORRECT_PASSWORD = "324";
-    const SECRET_LINK = "https://docs.google.com/document/d/1m7fFUMd31Jf5VVfPutMKAH2W03n19hspUK0ad03lGb4/edit?usp=drivesdk";
-    
-    // Тексты ответов
-    const MSG_LOGIN_OK = "\n[SUCCESS] Идентификатор подтвержден. Проверка уровня допуска...";
-    const MSG_ACCESS_GRANTED = "\n\n[ACCESS GRANTED] Доступ к БД P.M.C \"Atlantis\" разрешен. Извлечение архивов...";
-    const MSG_ERROR = "\n<span class='error-msg'>[CRITICAL ERROR] ОТКАЗ В ДОСТУПЕ. Нарушение периметра безопасности. Попытка заблокирована.</span>";
+    // КОНФИГУРАЦИЯ БЕЗОПАСНОСТИ
+    const CONFIG = {
+        LOGIN: "Bill",
+        PASSWORD: "324",
+        SECRET_URL: "https://docs.google.com/document/d/1m7fFUMd31Jf5VVfPutMKAH2W03n19hspUK0ad03lGb4/edit?usp=drivesdk",
+        TYPE_SPEED: 15 // Скорость симуляции печати текста (мс на символ)
+    };
 
-    const input = document.getElementById('commandInput');
-    const output = document.getElementById('output');
-    const prompt = document.getElementById('prompt');
+    const DOM = {
+        input: document.getElementById('commandInput'),
+        output: document.getElementById('output'),
+        prompt: document.getElementById('prompt')
+    };
 
     let currentStep = 'login'; 
 
+    // Фокус ввода по клику в любую точку экрана
     document.addEventListener('click', () => {
-        if (!input.disabled) input.focus();
+        if (!DOM.input.disabled) DOM.input.focus();
     });
 
-    function escapeHTML(str) {
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Функция безопасной вставки текста
+    function createLine(text, className = '') {
+        const line = document.createElement('div');
+        line.className = `output-line ${className}`;
+        DOM.output.appendChild(line);
+        return line;
     }
 
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const value = input.value.trim();
-            if (!value) return;
+    // Симуляция эффекта печатающей машинки
+    function typeText(text, className = '', callback = null) {
+        const line = createLine('', className);
+        let i = 0;
 
-            if (currentStep === 'login') {
-                output.innerHTML += `\n\nENTER OPERATOR ID: ${escapeHTML(value)}`;
-                
-                // Проверка логина без учета регистра (tolowercase)
-                if (value.toLowerCase() === CORRECT_LOGIN.toLowerCase()) {
-                    output.innerHTML += MSG_LOGIN_OK;
-                    currentStep = 'password';
-                    prompt.textContent = 'ENTER CRYPTO-KEY:';
-                    input.type = 'password';
-                } else {
-                    output.innerHTML += MSG_ERROR;
-                }
-                
-            } else if (currentStep === 'password') {
-                output.innerHTML += `\n\nENTER CRYPTO-KEY: ${'*'.repeat(value.length)}`;
-                
-                if (value === CORRECT_PASSWORD) {
-                    output.innerHTML += `<span class='success-msg'>${MSG_ACCESS_GRANTED}</span>`;
-                    input.disabled = true;
-                    input.blur();
-                    
-                    setTimeout(() => {
-                        window.location.href = SECRET_LINK;
-                    }, 2000);
-                } else {
-                    output.innerHTML += MSG_ERROR;
-                    
-                    // Возвращаем на шаг ввода логина при ошибке пароля
-                    currentStep = 'login';
-                    prompt.textContent = 'ENTER OPERATOR ID:';
-                    input.type = 'text';
-                }
+        function printChar() {
+            if (i < text.length) {
+                line.textContent += text.charAt(i);
+                i++;
+                window.scrollTo(0, document.body.scrollHeight);
+                setTimeout(printChar, CONFIG.TYPE_SPEED);
+            } else if (callback) {
+                callback();
             }
+        }
+        printChar();
+    }
 
-            input.value = '';
-            window.scrollTo(0, document.body.scrollHeight);
+    // Стартовая последовательность
+    const introLines = [
+        "INITIALIZING CLIENT DECRYPTION MODULE... [OK]",
+        "CONNECTING TO CENTRAL DATABASE... [CONNECTED]",
+        "\nACCESS RESTRICTED. IP RECORDED. INTERCEPT PROTOCOL ACTIVE.\n"
+    ];
+
+    function playIntro(index = 0) {
+        if (index < introLines.length) {
+            typeText(introLines[index], '', () => playIntro(index + 1));
+        } else {
+            DOM.input.disabled = false;
+            DOM.input.focus();
+        }
+    }
+
+    // Инициализация
+    DOM.input.disabled = true;
+    playIntro();
+
+    DOM.input.addEventListener('keydown', function(e) {
+        if (e.key !== 'Enter') return;
+
+        const value = DOM.input.value.trim();
+        DOM.input.value = '';
+        if (!value) return;
+
+        if (currentStep === 'login') {
+            createLine(`ENTER OPERATOR ID: ${value}`, 'user-input');
+
+            if (value.toLowerCase() === CONFIG.LOGIN.toLowerCase()) {
+                DOM.input.disabled = true;
+                typeText("\n[SUCCESS] Идентификатор подтвержден. Проверка уровня допуска...", 'success-msg', () => {
+                    currentStep = 'password';
+                    DOM.prompt.textContent = 'ENTER CRYPTO-KEY:';
+                    DOM.input.type = 'password';
+                    DOM.input.disabled = false;
+                    DOM.input.focus();
+                });
+            } else {
+                triggerError();
+            }
+            
+        } else if (currentStep === 'password') {
+            createLine(`ENTER CRYPTO-KEY: ${'*'.repeat(value.length)}`, 'user-input');
+            
+            if (value === CONFIG.PASSWORD) {
+                DOM.input.disabled = true;
+                DOM.input.blur();
+                
+                typeText("\n[ACCESS GRANTED] Доступ к БД P.M.C \"Atlantis\" разрешен. Извлечение архивов...", 'success-msg', () => {
+                    setTimeout(() => {
+                        window.location.href = CONFIG.SECRET_URL;
+                    }, 1000);
+                });
+            } else {
+                triggerError();
+            }
         }
     });
+
+    function triggerError() {
+        DOM.input.disabled = true;
+        typeText("\n[CRITICAL ERROR] ОТКАЗ В ДОСТУПЕ. Нарушение периметра безопасности. Попытка заблокирована.\n", 'error-msg', () => {
+            // Сброс состояния к вводу логина
+            currentStep = 'login';
+            DOM.prompt.textContent = 'ENTER OPERATOR ID:';
+            DOM.input.type = 'text';
+            DOM.input.disabled = false;
+            DOM.input.focus();
+        });
+    }
 </script>
 
 </body>
