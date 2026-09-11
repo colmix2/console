@@ -6,26 +6,22 @@
     <title>ATLANTIS // SECURE TERMINAL v4.0</title>
     <style>
         :root {
-            --glow: #00ff41;
-            --bg: #020504;
-            --bg-panel: rgba(2, 15, 5, 0.7);
-            --err: #ff1111;
-            --acc: #00ffff;
+            --glow: #006622;       /* Строгий корпоративный тёмно-зелёный */
+            --bg: #eef2f0;         /* Светлый стерильный фон */
+            --bg-panel: rgba(255, 255, 255, 0.85); /* Белое матовое стекло */
+            --err: #cc0000;        /* Контрастный красный для ошибок */
+            --acc: #0055ff;        /* Синий акцент для успешных логов */
         }
         body.alarm {
-            --glow: #ff1111;
-            --bg-panel: rgba(20, 2, 2, 0.7);
+            --glow: #cc0000;
+            --bg-panel: rgba(255, 230, 230, 0.9);
         }
         body {
-            background-image: url('https://githubusercontent.com');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
             background-color: var(--bg);
             color: var(--glow);
             font-family: 'Courier New', monospace;
             font-size: 15px;
+            font-weight: 600;
             margin: 0;
             padding: 40px 20px;
             min-height: 100vh;
@@ -41,19 +37,19 @@
             display: block;
             position: fixed;
             inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: linear-gradient(rgba(0, 0, 0, 0.03) 50%, rgba(255, 255, 255, 0.05) 50%), linear-gradient(90deg, rgba(0, 102, 34, 0.02), rgba(0, 0, 0, 0), rgba(0, 102, 34, 0.02));
             z-index: 999;
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
         }
         body::after {
-            background: linear-gradient(rgba(0, 0, 0, 0) 90%, rgba(0, 255, 65, 0.05) 95%, rgba(0, 0, 0, 0) 100%);
+            background: linear-gradient(rgba(255, 255, 255, 0) 90%, rgba(0, 102, 34, 0.03) 95%, rgba(255, 255, 255, 0) 100%);
             background-size: 100% 300%;
-            animation: scanline 6s linear infinite;
+            animation: scanline 8s linear infinite;
             z-index: 1000;
         }
         body.alarm::after {
-            background: linear-gradient(rgba(0, 0, 0, 0) 90%, rgba(255, 17, 17, 0.1) 95%, rgba(0, 0, 0, 0) 100%);
+            background: linear-gradient(rgba(255, 255, 255, 0) 90%, rgba(204, 0, 0, 0.04) 95%, rgba(255, 255, 255, 0) 100%);
             background-size: 100% 300%;
         }
         @keyframes scanline {
@@ -72,22 +68,21 @@
             width: 100%;
             max-width: 850px;
             background: var(--bg-panel);
-            border: 1px solid var(--glow);
+            border: 2px solid var(--glow);
             border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1), inset 0 0 20px rgba(0, 255, 65, 0.1);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08), inset 0 0 15px rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(10px);
             position: relative;
             transition: border 0.3s;
         }
         .header {
             color: var(--glow);
-            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+            border-bottom: 2px solid rgba(0, 102, 34, 0.2);
             padding-bottom: 15px;
             margin-bottom: 20px;
             font-weight: bold;
             line-height: 1.4;
-            text-shadow: 0 0 8px var(--glow);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -100,7 +95,6 @@
             margin: 0 auto 15px auto;
             opacity: 0.9;
             pointer-events: none;
-            filter: drop-shadow(0 0 8px var(--glow));
         }
         .line {
             line-height: 1.6;
@@ -143,20 +137,18 @@
             cursor: default;
         }
         .custom-view {
-            color: #fff;
+            color: #000000;        /* Вводимый текст теперь чёрный для контраста */
             font-family: inherit;
             font-size: inherit;
             white-space: pre-wrap;
             display: inline-flex;
             align-items: center;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
         }
         .custom-view::after {
             content: '_';
             margin-left: 3px;
             color: var(--glow);
             animation: blink 0.8s infinite;
-            text-shadow: 0 0 8px var(--glow);
         }
         @keyframes blink {
             0%, 49% { opacity: 1; }
@@ -165,14 +157,13 @@
         .error {
             color: var(--err);
             font-weight: bold;
-            text-shadow: 0 0 8px rgba(255, 17, 17, 0.6);
         }
         .success {
             color: var(--acc);
-            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+            font-weight: bold;
         }
         .gray {
-            color: rgba(0, 255, 65, 0.4);
+            color: rgba(0, 0, 0, 0.45);
         }
     </style>
 </head>
@@ -207,7 +198,7 @@ const DOM = {
     pr: document.getElementById('pr'), 
     blk: document.getElementById('blk') 
 };
-let step = 'login', isMask = false, gameInterval = null, stage = 0, targetWord = "", wordTimer = null, isKeyGame = false;
+let step = 'login', isMask = false, gameInterval = null, stage = 0, targetWord = "", wordTimer = null;
 let currentUser = "", chosenKeyIdx = -1, correctReportOption = -1;
 const CRYPTO_KEYS = ["ATL-4091", "ATL-1182", "ATL-7634", "ATL-9901", "ATL-2543"];
 const delay = ms => new Promise(r => setTimeout(r, ms));
@@ -228,7 +219,7 @@ function playBeep(f, t, d) {
         osc.type = t; 
         osc.frequency.value = f; 
         
-        g.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.015, audioCtx.currentTime); // Слегка тише звук для комфорта в светлой теме
         g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + d);
         
         osc.connect(g); 
@@ -251,17 +242,17 @@ async function type(txt, cls = "") {
     const d = addLine("", cls);
     for (let i = 0; i < txt.length; i++) {
         d.textContent += txt.charAt(i); 
-        if (Math.random() > 0.3) playBeep(800, 'square', 0.02); 
+        if (Math.random() > 0.3) playBeep(840, 'square', 0.015); 
         await delay(CFG.SPD);
     }
 }
 
 async function runBootLogs() {
     const p = ["BYPASSING FIREWALL... SUCCESS", "STEALTH MODE: CCJV OVERRIDE... [DONE]", "SPOOFING IP... INT-INTERNAL", "CLEANING LOGS... ERASED", "ANTI-CYBER ATTACK PROTOCOL ACTIVE."];
-    for (let i = 0; i < p.length; i++) {
-        await delay(150 + (performance.now() / 1000).toFixed(3) * 2); 
+    for (let i = 0; p.length > i; i++) {
+        await delay(120 + Math.random() * 100); 
         addLine("[DEBUG] " + Math.floor(Math.random() * p.length) + "| " + p[i], 'gray'); 
-        playBeep(120, 'sawtooth', 0.01);
+        playBeep(140, 'sawtooth', 0.01);
     }
     await delay(300); 
     await type("SYS: FOR ACCESS ENTRY - SUBMIT AUTH KEY OR EMPLOYEE ID.", "gray");
@@ -281,7 +272,7 @@ function ask(p, s, m) {
 
 function err(m) { 
     DOM.term.classList.add('shake'); 
-    playBeep(140, 'triangle', 0.35); 
+    playBeep(130, 'triangle', 0.35); 
     setTimeout(() => DOM.term.classList.remove('shake'), 400); 
     addLine(m, "error"); 
 }
@@ -306,14 +297,13 @@ async function scramblerDie() {
     DOM.out.innerHTML = "";
     document.getElementById('hd').style.display = 'none';
     
-    playBeep(80, 'sawtooth', 1.5);
-    playBeep(60, 'sawtooth', 1.5);
+    playBeep(70, 'sawtooth', 1.5);
+    playBeep(50, 'sawtooth', 1.5);
     DOM.term.classList.add('shake');
     
     const errBox = addLine("\n\n\n\n      ███████  ██████  ██████   ██████  ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      █████    ██████  ██████  ██    ██ ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      ███████  ██   ██ ██   ██  ██████  ██   ██ \n\n", "error");
     errBox.style.fontSize = "22px";
     errBox.style.textAlign = "center";
-    errBox.style.textShadow = "0 0 15px #ff1111";
     
     await delay(1000);
     addLine(">>> КРИТИЧЕСКИЙ СБОЙ ПАМЯТИ: СНОС СИСТЕМЫ...", "error");
@@ -325,8 +315,8 @@ async function scramblerDie() {
 async function bar() {
     const d = addLine("", 'success');
     for (let p = 0; p <= 100; p += 5) { 
-        d.textContent = `DECRYPTING: [${"#".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; 
-        playBeep(600 + p * 2, 'sine', 0.02); 
+        d.textContent = `DECRYPTING: [${"█".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; 
+        playBeep(550 + p * 2, 'sine', 0.02); 
         await delay(40); 
     }
 }
@@ -342,20 +332,6 @@ async function showEmployeeMenu() {
     ask('ВЫБЕРИТЕ ПУНКТ (1-4):', 'menu', false);
 }
 
-async function displayCryptoKeysOnly() {
-    await type(">>> ИЗВЛЕЧЕНИЕ АКТИВНЫХ КЛЮЧЕЙ ДЕШИФРАТОРА СЕССИИ...", "gray");
-    await bar();
-    await type("----------------------------------------", "gray");
-    for(let i = 0; i < CRYPTO_KEYS.length; i++) {
-        addLine(`КЛЮЧ №${i + 1}: [ ${CRYPTO_KEYS[i]} ]`, "success");
-    }
-    await type("----------------------------------------", "gray");
-    await type("🚨 ЗАПОМНИТЕ ИЛИ СФОТКАЙТЕ ДАННЫЕ КЛЮЧИ!", "error");
-    await type("ВОЗВРАТ В МЕНЮ ЧЕРЕЗ 5 СЕКУНД...", "gray");
-    setTimeout(() => { DOM.out.innerHTML = ""; showEmployeeMenu(); }, 5000);
-}
-
-// ПУНКТ 3: Открытие подменю с подразделами L.a.S и T.F.B
 async function showContractorsDepartmentMenu() {
     await type("=== СЕТЕВОЕ ОКРУЖЕНИЕ КОНТРАКТНИКОВ ===", "success");
     addLine("1. Департамент L.a.S", "success");
@@ -494,7 +470,7 @@ function triggerAudioChain(w, i) { if(i >= w.length) { addLine(">>> ПОВТОР
 async function startPhaseFive() { step = 'phase5'; stage = 0; addLine(">>> ЗВУКОВОЙ КАНАЛ СИНХРОНИЗИРОВАН.", "success"); await delay(600); err("🚨 КРИТИЧЕСКИЙ DDOS-ШТОРМ! СЕРВЕР ПЕРЕГРУЖЕН! ФАЗА 5"); await type(">>> СКАНИРУЙТЕ БИНАРНЫЕ СТРОКИ И НАХОДИТЕ АНОМАЛИЮ!", "error"); nextPhaseFiveVirus(); }
 function nextPhaseFiveVirus() { if (stage >= 3) { startPhaseSix(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let len = 8 + stage * 2; let baseArr = Array.from({length: len}, () => Math.random() > 0.5 ? "1" : "0"); let normal = baseArr.join(""); let anomalyArr = [...baseArr]; for(let i = 0; i < 3; i++) { anomalyArr[i] = anomalyArr[i] === "1" ? "0" : "1"; } let anomaly = anomalyArr.join(""); let anomalyIdx = Math.floor(Math.random() * 4); let lines = []; for(let i=0; i<4; i++) { if(i === anomalyIdx) lines.push(anomaly); else lines.push(normal); } targetWord = (anomalyIdx + 1).toString(); addLine(`[ФАЗА 5 - ПОТОК ${stage + 1}/3] СКАНИРОВАНИЕ ПАКЕТОВ:`, "error"); for(let i=0; i<4; i++) addLine(`${i+1}: ${lines[i]}`, "gray"); ask('ВВЕДИТЕ НОМЕР АНОМАЛЬНОЙ СТРОКИ:', 'phase5', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТЕРМИНАЛ КРАШНУЛСЯ ПОД DDOS-УДАРОМ."), 5000); }
 async function startPhaseSix() { step = 'phase6'; stage = 0; addLine(">>> ПОТОКИ ДАННЫХ ОЧИЩЕНЫ ОТ ВИРУСОВ.", "success"); await delay(600); err("🚨 СЕТЬ РАЗВАЛИВАЕТСЯ НА ЧАСТИ! ФИНАЛЬНАЯ МАРШРУТИЗАЦИЯ! ФАЗА 6"); await type(">>> ПРОВОДИТЕ ПАКЕТ СТРОГО ЧЕРЕЗ ОТКРЫТЫЕ УЗЛЫ СВЯЗИ!", "error"); nextPhaseSixRoute(); }
-function nextPhaseSixRoute() { if (stage >= 3) { endAllGamesSuccess(); return; } let ok = Math.random() > 0.5 ? "A" : "B"; targetWord = ok; addLine(`[ФАЗА 6 - ШЛЮЗ ${stage + 1}/3] АНАЛИЗ МАРШРУТОВ:`, "error"); addLine(`[МАРШРУТ А]: ` + (ok === "A" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "A" ? "success" : "error"); addLine(`[МАРШРУТ Б]: ` + (ok === "B" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "B" ? "success" : "error"); ask('ВВЕДИТЕ ОТКРЫТЫЙ МАРШРУТ (А / Б):', 'phase6', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ПАКЕТ СГОРЕЛ В РАЗОРВАННОЙ СЕТИ."), 3500); }
+function nextPhaseSixRoute() { if (stage >= 3) { endAllGamesSuccess(); return; } let ok = Math.random() > 0.5 ? "A" : "B"; targetWord = ok; addLine(`[ФАЗА 6 - ШЛЮЗ ${stage + 1}/3] АНАЛИЗ МАРШРУТОВ:`, "error"); addLine(`[МАРШРУТ А]: ` + (ok === "A" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "A" ? "success" : "error"); addLine(`[МАРШРУТ Б]: ` + (ok === "B" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "B" ? "success" : "error"); ask('ВЫБЕРИТЕ ОТКРЫТЫЙ МАРШРУТ (А / Б):', 'phase6', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ПАКЕТ СГОРЕЛ В РАЗОРВАННОЙ СЕТИ."), 3500); }
 
 async function endAllGamesSuccess() {
     clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar();
@@ -508,7 +484,7 @@ async function endAllGamesSuccess() {
     await delay(2500);
     await type(">>> ИНИЦИАЛИЗАЦИЯ ЗАЩИЩЕННОГО ПЕРЕНАПРАВЛЕНИЯ К СЕРВЕРУ...", "gray");
     await delay(3000); 
-    window.location.href = "https://docs.google.com/document/d/1m7fFUMd31Jf5VVfPutMKAH2W03n19hspUK0ad03lGb4/edit?usp=sharing";
+    window.location.href = "https://google.com";
 }
 DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
 DOM.inp.onkeydown = async (e) => {
@@ -550,21 +526,19 @@ DOM.inp.onkeydown = async (e) => {
     } else if (step === 'menu') {
         if (cv === '1') { startKeyGame(); } 
         else if (cv === '2') { startAndreyPhase1(); } 
-        else if (cv === '3') { DOM.out.innerHTML = ""; showContractorsDepartmentMenu(); } // Подменю
+        else if (cv === '3') { DOM.out.innerHTML = ""; showContractorsDepartmentMenu(); } 
         else if (cv === '4') { await type(">>> ОТКЛЮЧЕНИЕ...", "gray"); await delay(1000); DOM.out.innerHTML = ""; ask('AGENT ID / EMPLOYEE:', 'login', false); }
         else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); ask('ВЫБЕРИТЕ ПУНКТ (1-4):', 'menu', false); }
     } 
-    // Логика подменю контрактников
     else if (step === 'contractors_menu') {
         if (cv === '1') { ask('ВВЕДИТЕ ТОКЕН ДОСТУПА L.a.S:', 'check_las_pass', true); }
         else if (cv === '2') { ask('ВВЕДИТЕ ТОКЕН ДОСТУПА T.F.B:', 'check_tfb_pass', true); }
         else { DOM.out.innerHTML = ""; showEmployeeMenu(); }
     }
-    // Проверки паролей подразделов
     else if (step === 'check_las_pass') {
         if (cv === '368') {
             await type(">>> ТОКЕН СЕТИ ВЕРИФИЦИРОВАН. ДОСТУП ПРЕДОСТАВЛЕН.", "success"); await bar();
-            window.location.href = "https://colmix2.github.io/ConsoleLAS/";
+            window.location.href = "https://github.io";
         } else {
             err("🚨 ОШИБКА ДОСТУПА: НЕВЕРНЫЙ КОРНЕВОЙ ТОКЕН L.a.S"); await delay(1500); DOM.out.innerHTML = ""; showContractorsDepartmentMenu();
         }
@@ -572,12 +546,11 @@ DOM.inp.onkeydown = async (e) => {
     else if (step === 'check_tfb_pass') {
         if (cv === '868') {
             await type(">>> ТОКЕН СЕТИ ВЕРИФИЦИРОВАН. ДОСТУП ПРЕДОСТАВЛЕН.", "success"); await bar();
-            window.location.href = "https://colmix2.github.io/ConsoleTFB/";
+            window.location.href = "https://github.io";
         } else {
             err("🚨 ОШИБКА ДОСТУПА: НЕВЕРНЫЙ КОРНЕВОЙ ТОКЕН T.F.B"); await delay(1500); DOM.out.innerHTML = ""; showContractorsDepartmentMenu();
         }
     }
-    // Основные проверки фаз Андрея
     else if (step === 'andrey_p1_check') {
         if (cv === targetWord) { startAndreyPhase2(); } 
         else { die("🚨 СДВИГ ИМПУЛЬСА НЕВЕРЕН. СЕТЕВОЙ ШЛЮЗ ЗАБЛОКИРОВАН."); }
@@ -595,7 +568,7 @@ DOM.inp.onkeydown = async (e) => {
     else if (step === 'select_report') {
         if (cv === correctReportOption.toString()) {
             await type(">>> ИДЕНТИФИКАЦИЯ АРХИВА... УСПЕШНО.", "success"); await bar();
-            window.location.href = "https://docs.google.com/document/d/18EhokVTN-Q_rSTQhXzz0q3Df6yPx3CbmjVcPwfMNVIo/edit?usp=sharing";
+            window.location.href = "https://google.com";
         } else {
             err("🚨 КРИТИЧЕСКАЯ ОШИБКА: ДАННЫЙ АРХИВ ЗАБЛОКИРОВАН ИЛИ ПОВРЕЖДЕН."); await delay(1500); showEmployeeMenu();
         }
