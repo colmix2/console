@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ATLANTIS // SECURE TERMINAL v4.0</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLANTIS // SECURE TERMINAL v4.0</title>
     <style>
-        :root { --glow: #00ff41; --bg: #020a04; --bg-panel: rgba(2, 15, 5, 0.7); --err: #ff1111; --acc: #00ffff; }
-        body { background: var(--bg); color: var(--glow); font-family: 'Courier New', Courier, monospace; font-size: 15px; margin: 0; padding: 40px 20px; min-height: 100vh; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow-x: hidden; }
-        body::before { content: " "; display: block; position: fixed; inset: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.04)); z-index: 999; background-size: 100% 4px, 6px 100%; pointer-events: none; }
-        body::after { content: " "; display: block; position: fixed; inset: 0; background: linear-gradient(rgba(0,0,0,0) 90%, rgba(0,255,65,0.05) 95%, rgba(0,0,0,0) 100%); background-size: 100% 300%; animation: scanline 6s linear infinite; z-index: 1000; pointer-events: none; }
+        :root { --glow: #00ff41; --bg: #020504; --bg-panel: rgba(2, 15, 5, 0.7); --err: #ff1111; --acc: #00ffff; }
+        body { background: var(--bg); color: var(--glow); font-family: 'Courier New', monospace; font-size: 15px; margin: 0; padding: 40px 20px; min-height: 100vh; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow-x: hidden; }
+        body::before, body::after { content: " "; display: block; position: fixed; inset: 0; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); z-index: 999; background-size: 100% 4px, 6px 100%; pointer-events: none; }
+        body::after { background: linear-gradient(rgba(0,0,0,0) 90%, rgba(0,255,65,0.05) 95%, rgba(0,0,0,0) 100%); background-size: 100% 300%; animation: scanline 6s linear infinite; z-index: 1000; }
         @keyframes scanline { 0% { background-position: 0 -300%; } 100% { background-position: 0 300%; } }
-        @keyframes shake { 0%, 100% { transform: translate(0, 0); } 20%, 60% { transform: translate(-4px, 2px); } 40%, 80% { transform: translate(4px, -2px); } }
+        @keyframes shake { 0%, 100% { transform: translate(0,0); } 20%, 60% { transform: translate(-4px,2px); } 40%, 80% { transform: translate(4px,-2px); } }
         .shake { animation: shake 0.2s ease-in-out 2; }
-        .terminal-box { width: 100%; max-width: 850px; background: var(--bg-panel); border: 1px solid rgba(0, 255, 65, 0.4); border-radius: 8px; padding: 30px; box-shadow: 0 0 30px rgba(0, 255, 65, 0.1), inset 0 0 20px rgba(0, 255, 65, 0.1); backdrop-filter: blur(10px); position: relative; }
-        .header { color: #55ff55; border-bottom: 1px solid rgba(0, 255, 65, 0.3); padding-bottom: 15px; margin-bottom: 20px; font-weight: bold; line-height: 1.4; display: none; text-shadow: 0 0 8px rgba(0,255,65,0.6); }
+        .terminal-box { width: 100%; max-width: 850px; background: var(--bg-panel); border: 1px solid rgba(0,255,65,0.4); border-radius: 8px; padding: 30px; box-shadow: 0 0 30px rgba(0,255,65,0.1), inset 0 0 20px rgba(0,255,65,0.1); backdrop-filter: blur(10px); position: relative; }
+        .header { color: #55ff55; border-bottom: 1px solid rgba(0,255,65,0.3); padding-bottom: 15px; margin-bottom: 20px; font-weight: bold; line-height: 1.4; text-shadow: 0 0 8px rgba(0,255,65,0.6); display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .hub-logo { display: block; max-width: 150px; height: auto; margin: 0 auto 15px auto; opacity: 0.9; pointer-events: none; filter: drop-shadow(0 0 8px var(--glow)); }
         .line { line-height: 1.6; margin-bottom: 8px; word-break: break-all; white-space: pre-wrap; }
         .input-line { display: flex; align-items: center; margin-top: 20px; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
         .input-line.active { opacity: 1; visibility: visible; }
@@ -19,35 +22,22 @@
         .input-wrapper { position: relative; flex-grow: 1; display: flex; align-items: center; }
         input { position: absolute; inset: 0; opacity: 0; background: transparent; border: none; outline: none; cursor: default; }
         .custom-view { color: #fff; font-family: inherit; font-size: inherit; white-space: pre-wrap; display: inline-flex; align-items: center; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
-        .custom-view::after { content: "█"; margin-left: 3px; color: var(--glow); animation: blink 0.8s infinite; text-shadow: 0 0 8px var(--glow); }
+        .custom-view::after { content: '_'; margin-left: 3px; color: var(--glow); animation: blink 0.8s infinite; text-shadow: 0 0 8px var(--glow); }
         @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
         .error { color: var(--err); font-weight: bold; text-shadow: 0 0 8px rgba(255,17,17,0.6); }
         .success { color: var(--acc); text-shadow: 0 0 8px rgba(0,255,255,0.6); }
-        .gray { color: rgba(0, 255, 65, 0.4); }
-        
-        /* Стилизация постоянного логотипа в шапке */
-        .hub-logo {
-            display: block;
-            max-width: 180px; /* Размер логотипа сверху */
-            height: auto;
-            margin: 0 auto 20px auto;
-            /* Монохромный неоново-зеленый фильтр под стиль монитора */
-            filter: sepia(1) hue-rotate(85deg) saturate(5) brightness(1) contrast(1.2);
-            opacity: 0.8;
-            pointer-events: none;
-        }
+        .gray { color: rgba(0,255,65,0.4); }
     </style>
 </head>
 <body>
-<div class="terminal-box" id="term">
-    <!-- Твой логотип, который теперь ВСЕГДА висит в самом верху хаба -->
-    <img src="atlantis.png" class="hub-logo" alt="ATLANTIS LOGO">
 
-    <div class="header" id="hd">====================================================================
- P.M.C. "ATLANTIS" // INFILTRATION & STEALTH OPERATIONS NETWORK
-====================================================================</div>
+<div class="terminal-box" id="term">
+    <div class="header" id="hd">
+        <img src="atlantis.png" class="hub-logo" alt="ATLANTIS LOGO">
+        P.M.C. "ATLANTIS" // INFILTRATION & STEALTH OPERATIONS NETWORK
+    </div>
     <div id="out"></div>
-    <div class="input-line" id="inBlock">
+    <div class="input-line" id="blk">
         <span class="prompt" id="pr">AGENT ID:</span>
         <div class="input-wrapper">
             <input type="text" id="inp" autocomplete="off" disabled>
@@ -55,26 +45,66 @@
         </div>
     </div>
 </div>
+
 <script>
-    const CONFIG = { 
-        LOGIN: "bill",
-        PASS: "324", 
-        URL: "https://google.com", /* Сюда вставь сайт, куда кинет игроков ПОСЛЕ успешного ввода пароля */
-        TYPE_SPEED: 15 
-    };
-    const DOM = { term: document.getElementById('term'), inp: document.getElementById('inp'), view: document.getElementById('view'), out: document.getElementById('out'), pr: document.getElementById('pr'), hd: document.getElementById('hd'), blk: document.getElementById('inBlock') };
-    let step = 'login', isMasked = false;
-    const delay = ms => new Promise(res => setTimeout(res, ms));
-    function playBeep(freq, type, dur) { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(), osc = ctx.createOscillator(), g = ctx.createGain(); osc.type = type; osc.frequency.value = freq; g.gain.setValueAtTime(0.03, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + dur); osc.connect(g); g.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + dur); } catch(e){} }
-    function addLine(txt, cls = '') { const d = document.createElement('div'); d.className = `line ${cls}`; d.textContent = txt; DOM.out.appendChild(d); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); return d; }
-    async function typeText(txt, cls = '') { const d = addLine('', cls); for (let i = 0; i < txt.length; i++) { d.textContent += txt.charAt(i); if (Math.random() > 0.3) playBeep(800, 'square', 0.02); await delay(CONFIG.TYPE_SPEED); } }
-    async function runBootLogs() { const p = ["BYPASSING FIREWALL... SUCCESS", "STEALTH_MOD: CCTV OVERRIDE... [DONE]", "SPOOFING IP... INT-INTERNAL", "CLEANING LOGS... ERASED", "ANTI-CYBER ATTACK PROTOCOL ACTIVE."]; for (let i = 0; i < 20; i++) { addLine(`[${(performance.now() / 1000).toFixed(3)}s] [DEBUG] ${p[Math.floor(Math.random() * p.length)]}`, 'gray'); playBeep(120, 'sawtooth', 0.01); await delay(i > 14 ? 15 : 40); } playBeep(440, 'sine', 0.2); await delay(300); DOM.out.innerHTML = ''; DOM.hd.style.display = 'block'; await typeText("SYS: ESTABLISHING PROXY TUNNEL... STANDING BY FOR AGENT.", "success"); ask('ENTER AGENT ID:', 'login'); }
-    function ask(pt, ns, m = false) { step = ns; isMasked = m; DOM.pr.textContent = pt; DOM.inp.value = ''; DOM.view.textContent = ''; DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus(); }
-    async function runProgressBar() { const d = addLine('', 'success'); for (let p = 0; p <= 100; p += 5) { d.textContent = `DECRYPTING: [${'█'.repeat(p / 5)}${'░'.repeat(20 - (p / 5))}] ${p}%`; playBeep(600 + p * 2, 'sine', 0.02); await delay(40); } }
-    function err() { DOM.term.classList.add('shake'); playBeep(140, 'triangle', 0.35); setTimeout(() => DOM.term.classList.remove('shake'), 400); }
-    DOM.inp.addEventListener('input', () => { DOM.view.textContent = isMasked ? '★'.repeat(DOM.inp.value.length) : DOM.inp.value; });
-    DOM.inp.addEventListener('keydown', async (e) => { if (e.key === 'Enter') { const rv = DOM.inp.value, cv = rv.trim(); if (!cv && step !== 'pass') return; DOM.blk.classList.remove('active'); DOM.inp.disabled = true; addLine(`${DOM.pr.textContent} ${isMasked ? '★'.repeat(rv.length) : cv}`, 'success'); if (step === 'login') { if (cv.toLowerCase() === CONFIG.LOGIN) { await delay(300); ask('ENTER PASSKEY:', 'pass', true); } else { err(); addLine("ACCESS DENIED: UNKNOWN AGENT.", "error"); await delay(1000); ask('ENTER AGENT ID:', 'login'); } } else if (step === 'pass') { if (cv === CONFIG.PASS) { await runProgressBar(); await typeText("ACCESS GRANTED. REDIRECTING TO SECURE CORE...", "success"); await delay(1200); window.location.href = CONFIG.URL; } else { err(); addLine("SECURITY VIOLATION. LOCKDOWN ENFORCED.", "error"); await delay(1500); ask('ENTER AGENT ID:', 'login'); } } } });
-    document.addEventListener('click', () => { if (!DOM.inp.disabled) DOM.inp.focus(); }); window.onload = runBootLogs;
+const CFG = { LOGIN: "bill", PASS: "124", URL: "https://google.com", SPD: 15 };
+const DOM = { term: document.getElementById('term'), inp: document.getElementById('inp'), view: document.getElementById('view'), out: document.getElementById('out'), pr: document.getElementById('pr'), blk: document.getElementById('blk') };
+let step = 'login', isMask = false;
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
+function playBeep(f, t, d) {
+    try {
+        const c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(), g = c.createGain();
+        o.type = t; o.frequency.value = f; g.gain.setValueAtTime(0.03, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.00001, c.currentTime + d);
+        o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + d);
+    } catch(e) {}
+}
+
+function addLine(txt, cls = "") {
+    const d = document.createElement('div'); d.className = `line ${cls}`; d.textContent = txt; DOM.out.appendChild(d);
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); return d;
+}
+
+async function type(txt, cls = "") {
+    const d = addLine("", cls);
+    for (let i = 0; i < txt.length; i++) {
+        d.textContent += txt.charAt(i); if (Math.random() > 0.3) playBeep(800, 'square', 0.02); await delay(CFG.SPD);
+    }
+}
+
+async function runBootLogs() {
+    const p = ["BYPASSING FIREWALL... SUCCESS", "STEALTH MODE: CCJV OVERRIDE... [DONE]", "SPOOFING IP... INT-INTERNAL", "CLEANING LOGS... ERASED", "ANTI-CYBER ATTACK PROTOCOL ACTIVE."];
+    for (let i = 0; i < p.length; i++) {
+        await delay(150 + (performance.now() / 1000).toFixed(3) * 2); addLine(`[DEBUG] ${Math.floor(Math.random() * p.length)}| ` + p[i], 'gray'); playBeep(120, 'sawtooth', 0.01);
+    }
+    await delay(300); await type("SYS: ESTABLISHING PROXY TUNNEL... STANDING BY FOR AGENT.", "success"); ask('ENTER AGENT ID:', 'login', false);
+}
+
+function ask(p, s, m) { step = s; isMask = m; DOM.pr.textContent = p; DOM.inp.value = DOM.view.textContent = ""; DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus(); }
+function err(m) { DOM.term.classList.add('shake'); playBeep(140, 'triangle', 0.35); setTimeout(() => DOM.term.classList.remove('shake'), 400); addLine(m, "error"); }
+
+async function bar() {
+    const d = addLine("", 'success');
+    for (let p = 0; p <= 100; p += 5) { d.textContent = `DECRYPTING: [${"#".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; playBeep(600 + p * 2, 'sine', 0.02); await delay(40); }
+}
+
+DOM.inp.oninput = () => DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value;
+DOM.inp.onkeydown = async (e) => {
+    if (e.key !== 'Enter') return;
+    const v = DOM.inp.value, cv = v.trim(); if (!v) return;
+    DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
+    addLine(`${DOM.pr.textContent} ${isMask ? "*".repeat(v.length) : cv}`, 'success'); await delay(300);
+    
+    if (step === 'login') {
+        if (cv.toLowerCase() === CFG.LOGIN) ask('ENTER PASSKEY:', 'pass', true);
+        else { err("DENIED: UNKNOWN AGENT."); await delay(1000); ask('ENTER AGENT ID:', 'login', false); }
+    } else if (step === 'pass') {
+        if (cv === CFG.PASS) { await bar(); await type("ACCESS GRANTED. REDIRECTING TO SECURE CORE...", "success"); await delay(1200); window.location.href = CFG.URL; }
+        else { err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); await delay(1500); ask('ENTER AGENT ID:', 'login', false); }
+    }
+};
+document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); window.onload = runBootLogs;
 </script>
 </body>
 </html>
