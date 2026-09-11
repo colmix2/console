@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Access</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff66;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            margin: 0;
+        }
+        .terminal {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .output {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .input-line {
+            display: flex;
+            align-items: center;
+        }
+        .prompt {
+            margin-right: 10px;
+            user-select: none;
+        }
+        input {
+            background: transparent;
+            border: none;
+            color: #00ff66;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            outline: none;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal">
+    <div class="output" id="output">SYSTEM INITIALIZED...
+ENTER LOGIN AND PASSWORD TO ACCESS HIDDEN DATA.
+(Формат: логин пароль)</div>
+    <div class="input-line">
+        <span class="prompt">user@system:~$</span>
+        <input type="text" id="commandInput" autofocus autocomplete="off">
+    </div>
+</div>
+
+<script>
+    // НАСТРОЙКИ: Укажите свои данные здесь
+    const CORRECT_CREDS = "admin 1234"; // seremin Dolor231
+    const SECRET_LINK = "https://example.com"; // Ссылка при успехе
+    const ERROR_TEXT = "ОШИБКА: Доступ заблокирован. Неверные учетные данные. Попробуйте снова."; // Ваш кастомный текст при ошибке
+
+    const input = document.getElementById('commandInput');
+    const output = document.getElementById('output');
+
+    // Фокус на поле ввода при клике в любое место экрана
+    document.addEventListener('click', () => input.focus());
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const value = input.value.trim();
+            if (!value) return;
+
+            // Выводим то, что ввел пользователь
+            output.innerHTML += `\n\nuser@system:~$ ${value}`;
+
+            // Проверяем введенные данные
+            if (value === CORRECT_CREDS) {
+                output.innerHTML += `\n\n[SUCCESS] Доступ разрешен. Перенаправление...`;
+                input.disabled = true;
+                setTimeout(() => {
+                    window.location.href = SECRET_LINK;
+                }, 1500);
+            } else {
+                // Если введено не то — выводим ваш кастомный текст
+                output.innerHTML += `\n${ERROR_TEXT}`;
+            }
+
+            // Очищаем поле ввода и скроллим вниз
+            input.value = '';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    });
+</script>
+
+</body>
+</html>
