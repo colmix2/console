@@ -176,7 +176,8 @@
         PASSWORD: "324",
         SECRET_URL: "https://google.com",
         TYPE_SPEED: 15,
-        LOGO_FILE: "atlantis-logo.png" // Убедитесь, что на Гитхабе файл называется ИМЕННО ТАК (маленькими буквами)
+        // Ипользуем прямую внешнюю ссылку на загруженный прозрачный логотип
+        LOGO_FILE: "https://postimg.cc" 
     };
 
     const DOM = {
@@ -186,8 +187,8 @@
         logo: document.getElementById('logoImg')
     };
 
-    // Хак для принудительного обновления кэша картинок на GitHub Pages
-    DOM.logo.src = `${CONFIG.LOGO_FILE}?t=${new Date().getTime()}`;
+    // Устанавливаем прямую ссылку на картинку
+    DOM.logo.src = CONFIG.LOGO_FILE;
 
     let currentStep = 'login'; 
 
@@ -289,6 +290,3 @@
         });
     }
 </script>
-
-</body>
-</html>
