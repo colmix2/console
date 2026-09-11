@@ -6,15 +6,15 @@
     <title>ATLANTIS // SECURE TERMINAL v4.0</title>
     <style>
         :root {
-            --glow: #006622;       /* Строгий корпоративный тёмно-зелёный */
-            --bg: #eef2f0;         /* Светлый стерильный фон */
-            --bg-panel: rgba(255, 255, 255, 0.85); /* Белое матовое стекло */
-            --err: #cc0000;        /* Контрастный красный для ошибок */
-            --acc: #0055ff;        /* Синий акцент для успешных логов */
+            --glow: #ffffff;       /* Чистый белый текст */
+            --bg: #000000;         /* Абсолютно чёрный фон */
+            --bg-panel: #000000;   /* Полностью чёрная внутренняя часть панели */
+            --err: #ff1111;        
+            --acc: #ffffff;        /* Успешные логи тоже белые */
         }
         body.alarm {
-            --glow: #cc0000;
-            --bg-panel: rgba(255, 230, 230, 0.9);
+            --glow: #ff1111;
+            --bg-panel: #000000;
         }
         body {
             background-color: var(--bg);
@@ -37,19 +37,19 @@
             display: block;
             position: fixed;
             inset: 0;
-            background: linear-gradient(rgba(0, 0, 0, 0.03) 50%, rgba(255, 255, 255, 0.05) 50%), linear-gradient(90deg, rgba(0, 102, 34, 0.02), rgba(0, 0, 0, 0), rgba(0, 102, 34, 0.02));
+            background: linear-gradient(rgba(255, 255, 255, 0.02) 50%, rgba(0, 0, 0, 0.5) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.02));
             z-index: 999;
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
         }
         body::after {
-            background: linear-gradient(rgba(255, 255, 255, 0) 90%, rgba(0, 102, 34, 0.03) 95%, rgba(255, 255, 255, 0) 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0) 90%, rgba(255, 255, 255, 0.04) 95%, rgba(0, 0, 0, 0) 100%);
             background-size: 100% 300%;
             animation: scanline 8s linear infinite;
             z-index: 1000;
         }
         body.alarm::after {
-            background: linear-gradient(rgba(255, 255, 255, 0) 90%, rgba(204, 0, 0, 0.04) 95%, rgba(255, 255, 255, 0) 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0) 90%, rgba(204, 0, 0, 0.04) 95%, rgba(0, 0, 0, 0) 100%);
             background-size: 100% 300%;
         }
         @keyframes scanline {
@@ -68,17 +68,17 @@
             width: 100%;
             max-width: 850px;
             background: var(--bg-panel);
-            border: 2px solid var(--glow);
+            border: 2px solid var(--glow); /* Чёткая белая рамка */
             border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08), inset 0 0 15px rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             position: relative;
             transition: border 0.3s;
+            box-sizing: border-box;
         }
         .header {
             color: var(--glow);
-            border-bottom: 2px solid rgba(0, 102, 34, 0.2);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
             padding-bottom: 15px;
             margin-bottom: 20px;
             font-weight: bold;
@@ -93,8 +93,9 @@
             max-width: 150px;
             height: auto;
             margin: 0 auto 15px auto;
-            opacity: 0.9;
+            opacity: 0.95;
             pointer-events: none;
+            filter: brightness(0) invert(1); /* Жёсткий перевод любого логотипа в белый цвет */
         }
         .line {
             line-height: 1.6;
@@ -137,7 +138,7 @@
             cursor: default;
         }
         .custom-view {
-            color: #000000;        /* Вводимый текст теперь чёрный для контраста */
+            color: #ffffff;        
             font-family: inherit;
             font-size: inherit;
             white-space: pre-wrap;
@@ -163,10 +164,11 @@
             font-weight: bold;
         }
         .gray {
-            color: rgba(0, 0, 0, 0.45);
+            color: rgba(255, 255, 255, 0.5); /* Белые приглушённые логи */
         }
     </style>
 </head>
+
 <body>
 <div class="terminal-box" id="term">
     <div class="header" id="hd">
