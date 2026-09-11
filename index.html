@@ -31,14 +31,12 @@
             text-shadow: 0 0 6px var(--glow-color);
         }
 
-        /* Эффект мерцания экрана ЭЛТ */
         @keyframes flicker {
             0% { opacity: 0.98; }
             50% { opacity: 1; }
             100% { opacity: 0.99; }
         }
 
-        /* Эффект старого ЭЛТ-монитора (сканирующие линии) */
         body::before {
             content: " ";
             display: block;
@@ -52,7 +50,6 @@
             animation: flicker 0.15s infinite;
         }
 
-        /* Виньетка (затемнение по углам экрана) */
         body::after {
             content: " ";
             display: block;
@@ -70,12 +67,24 @@
             flex-direction: column;
         }
 
+        /* Оптимизированные стили для прозрачного PNG-логотипа */
+        .terminal-logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 180px;
+            height: auto;
+            /* Превращаем белый силуэт в зеленый за счет комбинации инверсии, сепии и hue-rotate */
+            filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%) drop-shadow(0 0 10px var(--text-color));
+            opacity: 0.85;
+        }
+
         .header-text {
             color: var(--accent-color);
             border-bottom: 1px dashed var(--text-color);
             padding-bottom: 15px;
             margin-bottom: 20px;
             white-space: pre-wrap;
+            text-align: center;
         }
 
         .output-container {
@@ -117,7 +126,6 @@
             text-shadow: 0 0 6px var(--glow-color);
         }
 
-        /* Стили кастомных классов */
         .error-msg {
             color: var(--error-color);
             text-shadow: 0 0 6px var(--error-glow);
@@ -137,8 +145,11 @@
 <body>
 
 <div class="terminal">
+    <!-- Подключение нового прозрачного файла -->
+    <img src="atlantis-logo.png" class="terminal-logo" alt="PMC Atlantis Logo">
+
     <div class="header-text">===================================================================
-  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v5.00
+  P.M.C. "ATLANTIS" — SECURE DATA NETWORK v5.30
   WARNING: AUTHORIZED MILITARY PERSONNEL ONLY
 ===================================================================</div>
     
@@ -151,12 +162,11 @@
 </div>
 
 <script>
-    // КОНФИГУРАЦИЯ БЕЗОПАСНОСТИ
     const CONFIG = {
         LOGIN: "Bill",
         PASSWORD: "324",
-        SECRET_URL: "https://docs.google.com/document/d/1m7fFUMd31Jf5VVfPutMKAH2W03n19hspUK0ad03lGb4/edit?usp=drivesdk",
-        TYPE_SPEED: 15 // Скорость симуляции печати текста (мс на символ)
+        SECRET_URL: "https://google.com",
+        TYPE_SPEED: 15
     };
 
     const DOM = {
@@ -167,12 +177,10 @@
 
     let currentStep = 'login'; 
 
-    // Фокус ввода по клику в любую точку экрана
     document.addEventListener('click', () => {
         if (!DOM.input.disabled) DOM.input.focus();
     });
 
-    // Функция безопасной вставки текста
     function createLine(text, className = '') {
         const line = document.createElement('div');
         line.className = `output-line ${className}`;
@@ -180,7 +188,6 @@
         return line;
     }
 
-    // Симуляция эффекта печатающей машинки
     function typeText(text, className = '', callback = null) {
         const line = createLine('', className);
         let i = 0;
@@ -198,7 +205,6 @@
         printChar();
     }
 
-    // Стартовая последовательность
     const introLines = [
         "INITIALIZING CLIENT DECRYPTION MODULE... [OK]",
         "CONNECTING TO CENTRAL DATABASE... [CONNECTED]",
@@ -214,7 +220,6 @@
         }
     }
 
-    // Инициализация
     DOM.input.disabled = true;
     playIntro();
 
@@ -262,7 +267,6 @@
     function triggerError() {
         DOM.input.disabled = true;
         typeText("\n[CRITICAL ERROR] ОТКАЗ В ДОСТУПЕ. Нарушение периметра безопасности. Попытка заблокирована.\n", 'error-msg', () => {
-            // Сброс состояния к вводу логина
             currentStep = 'login';
             DOM.prompt.textContent = 'ENTER OPERATOR ID:';
             DOM.input.type = 'text';
