@@ -1,7 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLANTIS // SECURE TERMINAL v4.0</title>
+    <style>
+        :root { --glow: #00ff41; --bg: #020504; --bg-panel: rgba(2, 15, 5, 0.7); --err: #ff1111; --acc: #00ffff; }
+        body { background-image: url('https://githubusercontent.com'); background-size: cover; background-position: center; background-repeat: no-repeat; background-attachment: fixed; background-color: var(--bg); color: var(--glow); font-family: 'Courier New', monospace; font-size: 15px; margin: 0; padding: 40px 20px; min-height: 100vh; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow-x: hidden; }
+        body::before, body::after { content: " "; display: block; position: fixed; inset: 0; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); z-index: 999; background-size: 100% 4px, 6px 100%; pointer-events: none; }
+        body::after { background: linear-gradient(rgba(0,0,0,0) 90%, rgba(0,255,65,0.05) 95%, rgba(0,0,0,0) 100%); background-size: 100% 300%; animation: scanline 6s linear infinite; z-index: 1000; }
+        @keyframes scanline { 0% { background-position: 0 -300%; } 100% { background-position: 0 300%; } }
+        @keyframes shake { 0%, 100% { transform: translate(0,0); } 20%, 60% { transform: translate(-4px,2px); } 40%, 80% { transform: translate(4px,-2px); } }
+        .shake { animation: shake 0.2s ease-in-out 2; }
+        .terminal-box { width: 100%; max-width: 850px; background: var(--bg-panel); border: 1px solid rgba(0,255,65,0.4); border-radius: 8px; padding: 30px; box-shadow: 0 0 30px rgba(0,255,65,0.1), inset 0 0 20px rgba(0,255,65,0.1); backdrop-filter: blur(10px); position: relative; }
+        .header { color: #55ff55; border-bottom: 1px solid rgba(0,255,65,0.3); padding-bottom: 15px; margin-bottom: 20px; font-weight: bold; line-height: 1.4; text-shadow: 0 0 8px rgba(0,255,65,0.6); display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .hub-logo { display: block; max-width: 150px; height: auto; margin: 0 auto 15px auto; opacity: 0.9; pointer-events: none; filter: drop-shadow(0 0 8px var(--glow)); }
+        .line { line-height: 1.6; margin-bottom: 8px; word-break: break-all; white-space: pre-wrap; }
+        .input-line { display: flex; align-items: center; margin-top: 20px; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
+        .input-line.active { opacity: 1; visibility: visible; }
+        .prompt { margin-right: 12px; color: #55ff55; font-weight: bold; flex-shrink: 0; letter-spacing: 1px; }
+        .input-wrapper { position: relative; flex-grow: 1; display: flex; align-items: center; }
+        input { position: absolute; inset: 0; opacity: 0; background: transparent; border: none; outline: none; cursor: default; }
+        .custom-view { color: #fff; font-family: inherit; font-size: inherit; white-space: pre-wrap; display: inline-flex; align-items: center; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        .custom-view::after { content: '_'; margin-left: 3px; color: var(--glow); animation: blink 0.8s infinite; text-shadow: 0 0 8px var(--glow); }
+        @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        .error { color: var(--err); font-weight: bold; text-shadow: 0 0 8px rgba(255,17,17,0.6); }
+        .success { color: var(--acc); text-shadow: 0 0 8px rgba(0,255,255,0.6); }
+        .gray { color: rgba(0,255,65,0.4); }
+    </style>
+</head>
+<body>
+
+<div class="terminal-box" id="term">
+    <div class="header" id="hd">
+        <img src="atlantis.png" class="hub-logo" alt="ATLANTIS LOGO">
+        P.M.C. "ATLANTIS" // INFILTRATION & STEALTH OPERATIONS NETWORK
+    </div>
+    <div id="out"></div>
+    <div class="input-line" id="blk">
+        <span class="prompt" id="pr">AGENT ID / EMPLOYEE:</span>
+        <div class="input-wrapper">
+            <input type="text" id="inp" autocomplete="off" disabled>
+            <div class="custom-view" id="view"></div>
+        </div>
+    </div>
+</div>
+
 <script>
-const CFG = { LOGIN: "bill", PASS: "124", URL: "https://google.com", SPD: 15 };
+const CFG = { LOGIN: "bill", PASS: "324", SPD: 15 };
 const DOM = { term: document.getElementById('term'), inp: document.getElementById('inp'), view: document.getElementById('view'), out: document.getElementById('out'), pr: document.getElementById('pr'), blk: document.getElementById('blk') };
-let step = 'login', isMask = false;
+let step = 'login', isMask = false, gameInterval = null, stage = 0;
 const delay = ms => new Promise(r => setTimeout(r, ms));
 
 function playBeep(f, t, d) {
@@ -28,9 +76,13 @@ async function type(txt, cls = "") {
 async function runBootLogs() {
     const p = ["BYPASSING FIREWALL... SUCCESS", "STEALTH MODE: CCJV OVERRIDE... [DONE]", "SPOOFING IP... INT-INTERNAL", "CLEANING LOGS... ERASED", "ANTI-CYBER ATTACK PROTOCOL ACTIVE."];
     for (let i = 0; i < p.length; i++) {
-        await delay(150 + (performance.now() / 1000).toFixed(3) * 2); addLine(`[DEBUG] ${Math.floor(Math.random() * p.length)}| ` + p[i], 'gray'); playBeep(120, 'sawtooth', 0.01);
+        await delay(150 + (performance.now() / 1000).toFixed(3) * 2); addLine("[DEBUG] " + Math.floor(Math.random() * p.length) + "| " + p[i], 'gray'); playBeep(120, 'sawtooth', 0.01);
     }
-    await delay(300); await type("SYS: ESTABLISHING PROXY TUNNEL... STANDING BY FOR AGENT.", "success"); ask('ENTER AGENT ID:', 'login', false);
+    await delay(300); 
+    await type("SYS: FOR MAIN DATABASE ACCESS - ENTER 'BASE'.", "gray");
+    await type("SYS: FOR EMPLOYEE LOGIN - ENTER RELEVANT ID NAME.", "gray");
+    await type("SYS: STANDING BY ДЛЯ ВВОДА ДАННЫХ...", "success"); 
+    ask('AGENT ID / EMPLOYEE:', 'login', false);
 }
 
 function ask(p, s, m) { step = s; isMask = m; DOM.pr.textContent = p; DOM.inp.value = DOM.view.textContent = ""; DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus(); }
@@ -41,26 +93,50 @@ async function bar() {
     for (let p = 0; p <= 100; p += 5) { d.textContent = `DECRYPTING: [${"#".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; playBeep(600 + p * 2, 'sine', 0.02); await delay(40); }
 }
 
-DOM.inp.oninput = () => DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value;
+async function startMiniGame() {
+    step = 'game'; stage = 0;
+    await type(">>> ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ДЕШИФРОВКИ...", "success");
+    await type(">>> ИНСТРУКЦИЯ: НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ!", "gray");
+    await delay(500); nextStage();
+}
+
+function nextStage() {
+    if (stage >= 3) { endMiniGame(); return; }
+    const st = ["CONNECTING TO DATABASE...", "OVERRIDING SECURITY...", "EXTRACTING HASHES..."];
+    addLine(st[stage], "success"); const d = addLine("", "gray");
+    gameInterval = setInterval(() => {
+        let ch = "0123456789ABCDEFXYZ!@#%", hex = Array.from({length: 8}, () => ch[Math.floor(Math.random() * ch.length)]).join("");
+        d.textContent = `[BRUTEFORCE FLOW #${stage + 1}]: ` + hex; playBeep(400, 'sine', 0.005);
+    }, 60);
+    DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus();
+}
+
+async function endMiniGame() {
+    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
+    await bar();
+    await type(">>> УСПЕХ! БАЗА ДАННЫХ СКОМПРОМЕТИРОВАНА.", "success");
+    await type(">>> НАЙДЕНЫ ЛОГИ СОТРУДНИКА BILL. КЛЮЧ: " + CFG.PASS, "success");
+    await delay(2000); ask('AGENT ID / EMPLOYEE:', 'login', false);
+}
+
+DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
 DOM.inp.onkeydown = async (e) => {
     if (e.key !== 'Enter') return;
+    if (step === 'game') { clearInterval(gameInterval); playBeep(900, 'square', 0.1); addLine(">>> УЗЕЛ СЕГМЕНТА ЗАФИКСИРОВАН.", "success"); stage++; await delay(400); nextStage(); return; }
     const v = DOM.inp.value, cv = v.trim(); if (!v) return;
     DOM.blk.classList.remove('active'); DOM.inp.disabled = true;
-    addLine(`${DOM.pr.textContent} ${isMask ? "*".repeat(v.length) : cv}`, 'success'); await delay(300);
+    addLine(DOM.pr.textContent + " " + (isMask ? "*".repeat(v.length) : cv), 'success'); await delay(300);
     
     if (step === 'login') {
-        if (cv.toLowerCase() === CFG.LOGIN) {
-            ask('ENTER PASSKEY:', 'pass', true); // Здесь всё работает
-        } else { 
-            err("DENIED: UNKNOWN AGENT."); await delay(1000); ask('ENTER AGENT ID:', 'login', false); 
-        }
+        if (cv.toLowerCase() === 'base') startMiniGame();
+        else if (cv.toLowerCase() === CFG.LOGIN) ask('ENTER PASSKEY:', 'pass', true);
+        else { err("DENIED: UNKNOWN ID."); await delay(1000); ask('AGENT ID / EMPLOYEE:', 'login', false); }
     } else if (step === 'pass') {
-        if (cv === CFG.PASS) { 
-            await bar(); await type("ACCESS GRANTED. REDIRECTING TO SECURE CORE...", "success"); await delay(1200); window.location.href = CFG.URL; 
-        } else { 
-            err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); await delay(1500); ask('ENTER AGENT ID:', 'login', false); 
-        }
+        if (cv === CFG.PASS) { await bar(); await type("ДОБРО ПОЖАЛОВАТЬ, " + CFG.LOGIN.toUpperCase(), "success"); await type("ДОСТУП ОТКРЫТ. КОНЕЦ СВЯЗИ.", "success"); }
+        else { err("SECURITY VIOLATION. LOCKDOWN ENFORCED."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
     }
 };
 document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); window.onload = runBootLogs;
 </script>
+</body>
+</html>
