@@ -572,7 +572,7 @@ DOM.inp.onkeydown = async (e) => {
     else if (step === 'check_tfb_pass') {
         if (cv === '868') {
             await type(">>> ТОКЕН СЕТИ ВЕРИФИЦИРОВАН. ДОСТУП ПРЕДОСТАВЛЕН.", "success"); await bar();
-            window.location.href = "https://google.com";
+            window.location.href = "https://colmix2.github.io/ConsoleTFB/";
         } else {
             err("🚨 ОШИБКА ДОСТУПА: НЕВЕРНЫЙ КОРНЕВОЙ ТОКЕН T.F.B"); await delay(1500); DOM.out.innerHTML = ""; showContractorsDepartmentMenu();
         }
