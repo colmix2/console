@@ -3,54 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATLANTIS // SECURE TERMINAL v4.0</title>
+    <title>ATLANTIS // CORE TERMINAL v1.0</title>
     <style>
         :root {
-            --glow: #ffffff;       /* Чистый белый текст */
-            --bg: #000000;         /* Абсолютно чёрный фон */
-            --bg-panel: #000000;   /* Полностью чёрная внутренняя часть панели */
+            --glow: #00ccff;       /* Тактический неоново-голубой цвет Атлантиса */
+            --glow-dim: #004466;   
+            --bg: #020508;         
+            --bg-panel: rgba(5, 10, 15, 0.95); 
             --err: #ff1111;        
-            --acc: #ffffff;        /* Успешные логи тоже белые */
+            --acc: #00ff66;        
         }
-        body.alarm {
-            --glow: #ff1111;
-            --bg-panel: #000000;
+        /* Жёсткая No-Scroll фиксация экрана */
+        html, body {
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; 
         }
         body {
-            background-color: var(--bg);
             color: var(--glow);
             font-family: 'Courier New', monospace;
-            font-size: 15px;
-            font-weight: 600;
-            margin: 0;
-            padding: 40px 20px;
-            min-height: 100vh;
-            box-sizing: border-box;
+            font-size: 16px;       
+            font-weight: 700;      
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
-            transition: background 0.3s, color 0.3s;
+            box-sizing: border-box;
         }
         body::before, body::after {
             content: " ";
             display: block;
             position: fixed;
             inset: 0;
-            background: linear-gradient(rgba(255, 255, 255, 0.02) 50%, rgba(0, 0, 0, 0.5) 50%), linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0), rgba(255, 255, 255, 0.02));
+            background: linear-gradient(rgba(0, 204, 255, 0.01) 50%, rgba(0, 0, 0, 0.5) 50%), linear-gradient(90deg, rgba(0, 204, 255, 0.02), rgba(0, 0, 0, 0), rgba(0, 204, 255, 0.02));
             z-index: 999;
             background-size: 100% 4px, 6px 100%;
             pointer-events: none;
         }
         body::after {
-            background: linear-gradient(rgba(0, 0, 0, 0) 90%, rgba(255, 255, 255, 0.04) 95%, rgba(0, 0, 0, 0) 100%);
+            background: linear-gradient(rgba(0, 0, 0, 0) 90%, rgba(0, 204, 255, 0.03) 95%, rgba(0, 0, 0, 0) 100%);
             background-size: 100% 300%;
-            animation: scanline 8s linear infinite;
+            animation: scanline 6s linear infinite;
             z-index: 1000;
-        }
-        body.alarm::after {
-            background: linear-gradient(rgba(0, 0, 0, 0) 90%, rgba(204, 0, 0, 0.04) 95%, rgba(0, 0, 0, 0) 100%);
-            background-size: 100% 300%;
         }
         @keyframes scanline {
             0% { background-position: 0 -300%; }
@@ -58,69 +54,86 @@
         }
         @keyframes shake {
             0%, 100% { transform: translate(0, 0); }
-            20%, 60% { transform: translate(-4px, 2px); }
-            40%, 80% { transform: translate(4px, -2px); }
+            20%, 60% { transform: translate(-4px, 1px); }
+            40%, 80% { transform: translate(4px, -1px); }
         }
-        .shake {
-            animation: shake 0.2s ease-in-out 2;
-        }
+        .shake { animation: shake 0.2s ease-in-out 2; }
         .terminal-box {
-            width: 100%;
+            width: 95%;
             max-width: 850px;
+            height: 90vh; 
             background: var(--bg-panel);
-            border: 2px solid var(--glow); /* Чёткая белая рамка */
-            border-radius: 8px;
+            border: 2px solid var(--glow-dim); 
+            border-radius: 4px;
             padding: 30px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 204, 255, 0.15), inset 0 0 20px rgba(0, 204, 255, 0.1);
+            backdrop-filter: blur(12px);
             position: relative;
-            transition: border 0.3s;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
         .header {
             color: var(--glow);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid rgba(0, 204, 255, 0.25);
             padding-bottom: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: bold;
-            line-height: 1.4;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.6); 
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
+            flex-shrink: 0; 
         }
         .hub-logo {
             display: block;
-            max-width: 150px;
+            width: 150px;           
             height: auto;
-            margin: 0 auto 15px auto;
+            margin: 0 auto 10px auto; 
             opacity: 0.95;
             pointer-events: none;
-            filter: brightness(0) invert(1); /* Жёсткий перевод любого логотипа в белый цвет */
+            filter: drop-shadow(0 0 20px var(--glow)); 
         }
+        /* Внутреннее независимое окно вывода логов */
+        #out {
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding-right: 8px;
+            margin-bottom: 15px;
+        }
+        #out::-webkit-scrollbar { width: 4px; }
+        #out::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.4); }
+        #out::-webkit-scrollbar-thumb { background: var(--glow-dim); border-radius: 2px; }
+
         .line {
             line-height: 1.6;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             word-break: break-all;
             white-space: pre-wrap;
+            text-shadow: 0 0 4px rgba(0, 204, 255, 0.2); 
         }
         .input-line {
             display: flex;
             align-items: center;
-            margin-top: 20px;
+            margin-top: auto; 
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 204, 255, 0.1);
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.2s;
+            flex-shrink: 0;
         }
-        .input-line.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .input-line.active { opacity: 1; visibility: visible; }
         .prompt {
             margin-right: 12px;
             color: var(--glow);
             font-weight: bold;
             flex-shrink: 0;
             letter-spacing: 1px;
+            text-shadow: 0 0 6px var(--glow);
         }
         .input-wrapper {
             position: relative;
@@ -135,49 +148,43 @@
             background: transparent;
             border: none;
             outline: none;
-            cursor: default;
+            cursor: text;
+            width: 100%;
         }
         .custom-view {
             color: #ffffff;        
             font-family: inherit;
             font-size: inherit;
+            font-weight: bold;
             white-space: pre-wrap;
             display: inline-flex;
             align-items: center;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
         }
         .custom-view::after {
             content: '_';
-            margin-left: 3px;
-            color: var(--glow);
+            margin-left: 4px;
+            color: var(--glow);     
             animation: blink 0.8s infinite;
         }
         @keyframes blink {
             0%, 49% { opacity: 1; }
             50%, 100% { opacity: 0; }
         }
-        .error {
-            color: var(--err);
-            font-weight: bold;
-        }
-        .success {
-            color: var(--acc);
-            font-weight: bold;
-        }
-        .gray {
-            color: rgba(255, 255, 255, 0.5); /* Белые приглушённые логи */
-        }
+        .error { color: var(--err); font-weight: bold; text-shadow: 0 0 10px rgba(255, 17, 17, 0.6); }
+        .success { color: var(--acc); font-weight: bold; text-shadow: 0 0 10px rgba(0, 255, 102, 0.6); }
+        .gray { color: rgba(0, 204, 255, 0.35); } 
     </style>
 </head>
-
 <body>
 <div class="terminal-box" id="term">
     <div class="header" id="hd">
-        <img src="atlantis.png" class="hub-logo" alt="ATLANTIS LOGO">
-        P.M.C. "ATLANTIS" // INFILTRATION & STEALTH OPERATIONS NETWORK
+        <img src="ART_logo.png" class="hub-logo" alt="ATLANTIS LOGO">
+        PMC ATLANTIS // SECURE DATA GATEWAY v1.0
     </div>
     <div id="out"></div>
     <div class="input-line" id="blk">
-        <span class="prompt" id="pr">AGENT ID / EMPLOYEE:</span>
+        <span class="prompt" id="pr">ENTER SECURITY ACCESS KEY:</span>
         <div class="input-wrapper">
             <input type="text" id="inp" autocomplete="off" disabled>
             <div class="custom-view" id="view"></div>
@@ -185,398 +192,216 @@
     </div>
 </div>
 <script>
-const CFG = { 
-    USERS: {
-        "bill": "324",
-        "andrey": "345"
-    }, 
-    SPD: 15 
-};
+const CFG = { REAL_TOKEN: "324", SPD: 15 };
 const DOM = { 
-    term: document.getElementById('term'), 
-    inp: document.getElementById('inp'), 
-    view: document.getElementById('view'), 
-    out: document.getElementById('out'), 
-    pr: document.getElementById('pr'), 
-    blk: document.getElementById('blk') 
+    term: document.getElementById('term'), inp: document.getElementById('inp'), 
+    view: document.getElementById('view'), out: document.getElementById('out'), 
+    pr: document.getElementById('pr'), blk: document.getElementById('blk') 
 };
-let step = 'login', isMask = false, gameInterval = null, stage = 0, targetWord = "", wordTimer = null;
-let currentUser = "", chosenKeyIdx = -1, correctReportOption = -1;
-const CRYPTO_KEYS = ["ATL-4091", "ATL-1182", "ATL-7634", "ATL-9901", "ATL-2543"];
+let step = 'login', dialogueStage = 0, wordTimer = null, targetWord = "";
 const delay = ms => new Promise(r => setTimeout(r, ms));
-
 let audioCtx = null;
 
 function playBeep(f, t, d) {
     try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        
-        osc.type = t; 
-        osc.frequency.value = f; 
-        
-        g.gain.setValueAtTime(0.015, audioCtx.currentTime); // Слегка тише звук для комфорта в светлой теме
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        osc.type = t; osc.frequency.value = f;
+        g.gain.setValueAtTime(0.01, audioCtx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + d);
-        
-        osc.connect(g); 
-        g.connect(audioCtx.destination); 
-        
-        osc.start(); 
-        osc.stop(audioCtx.currentTime + d);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + d);
     } catch(e) {}
 }
-
+function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 function addLine(txt, cls = "") {
-    const d = document.createElement('div'); 
-    d.className = `line ${cls}`; 
-    d.textContent = txt; 
-    DOM.out.appendChild(d);
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); 
-    return d;
+    const d = document.createElement('div'); d.className = `line ${cls}`; d.textContent = txt;
+    DOM.out.appendChild(d); DOM.out.scrollTop = DOM.out.scrollHeight; return d;
 }
 async function type(txt, cls = "") {
     const d = addLine("", cls);
     for (let i = 0; i < txt.length; i++) {
-        d.textContent += txt.charAt(i); 
-        if (Math.random() > 0.3) playBeep(840, 'square', 0.015); 
-        await delay(CFG.SPD);
+        d.textContent += txt.charAt(i); playBeep(800, 'sine', 0.015); await delay(CFG.SPD);
     }
 }
-
 async function runBootLogs() {
-    const p = ["BYPASSING FIREWALL... SUCCESS", "STEALTH MODE: CCJV OVERRIDE... [DONE]", "SPOOFING IP... INT-INTERNAL", "CLEANING LOGS... ERASED", "ANTI-CYBER ATTACK PROTOCOL ACTIVE."];
-    for (let i = 0; p.length > i; i++) {
-        await delay(120 + Math.random() * 100); 
-        addLine("[DEBUG] " + Math.floor(Math.random() * p.length) + "| " + p[i], 'gray'); 
-        playBeep(140, 'sawtooth', 0.01);
-    }
-    await delay(300); 
-    await type("SYS: FOR ACCESS ENTRY - SUBMIT AUTH KEY OR EMPLOYEE ID.", "gray");
-    await type("SYS: STANDING BY...", "success"); 
-    ask('AGENT ID / EMPLOYEE:', 'login', false);
-}
-
-function ask(p, s, m) { 
-    step = s; 
-    isMask = m; 
-    DOM.pr.textContent = p; 
-    DOM.inp.value = DOM.view.textContent = ""; 
-    DOM.inp.disabled = false; 
-    DOM.blk.classList.add('active'); 
-    DOM.inp.focus(); 
-}
-
-function err(m) { 
-    DOM.term.classList.add('shake'); 
-    playBeep(130, 'triangle', 0.35); 
-    setTimeout(() => DOM.term.classList.remove('shake'), 400); 
-    addLine(m, "error"); 
-}
-
-function die(m) { 
-    clearTimeout(wordTimer); 
-    clearInterval(gameInterval); 
-    err(m); 
-    setTimeout(() => location.reload(), 2500); 
-}
-
-async function scramblerDie() {
-    clearTimeout(wordTimer);
-    clearInterval(gameInterval);
-    DOM.blk.classList.remove('active');
-    DOM.inp.disabled = true;
-    
-    await delay(500);
-    await type("Scrambler: Наконец-то. Скрамблер заработал.. Не долго ты продержался.", "error");
-    await delay(2000);
-    
     DOM.out.innerHTML = "";
-    document.getElementById('hd').style.display = 'none';
-    
-    playBeep(70, 'sawtooth', 1.5);
-    playBeep(50, 'sawtooth', 1.5);
-    DOM.term.classList.add('shake');
-    
-    const errBox = addLine("\n\n\n\n      ███████  ██████  ██████   ██████  ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      █████    ██████  ██████  ██    ██ ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      ███████  ██   ██ ██   ██  ██████  ██   ██ \n\n", "error");
-    errBox.style.fontSize = "22px";
-    errBox.style.textAlign = "center";
-    
-    await delay(1000);
-    addLine(">>> КРИТИЧЕСКИЙ СБОЙ ПАМЯТИ: СНОС СИСТЕМЫ...", "error");
-    await delay(1500);
-    
-    location.reload();
+    const p = [
+        "SYNCHRONIZING RECON SAT-LINKS... DONE", 
+        "DECRYPTING DEPARTMENT LOGS... LOADED", 
+        "ISOLATING ROUTER GATEWAYS... ACTIVE", 
+        "ESTABLISHING TAC-COM CONNECTION... SUCCESS"
+    ];
+    for (let i = 0; i < p.length; i++) {
+        await delay(70 + Math.random() * 70); addLine("[ATLANTIS-NET] | " + p[i], 'gray');
+    }
+    await delay(300);
+    await type("SYS: WELCOME BACK, AGENT ANDREY.", "gray");
+    ask('ENTER SECURITY ACCESS KEY:', 'login', false);
 }
-
+function ask(p, s, m) { 
+    step = s; DOM.pr.textContent = p; DOM.inp.value = DOM.view.textContent = ""; 
+    DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus(); 
+}
+function err(m) { 
+    DOM.term.classList.add('shake'); playBeep(130, 'sawtooth', 0.4); 
+    setTimeout(() => DOM.term.classList.remove('shake'), 400); addLine(m, "error"); 
+}
+async function terminalScramblerDie(m) {
+    clearTimeout(wordTimer); DOM.blk.classList.remove('active'); DOM.inp.disabled = true; err(m); await delay(1000);
+    await type("[SYS]: КРИТИЧЕСКАЯ УГРОЗА ВЗЛОМА. СКРАМБЛЕР ВЫЖЕГ ПОРТЫ ПАМЯТИ.", "error"); await delay(1500);
+    DOM.out.innerHTML = ""; playBeep(50, 'sawtooth', 2.0); DOM.term.classList.add('shake');
+    const errBox = addLine("\n\n\n\n      ███████  ██████  ██████   ██████  ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      █████    ██████  ██████  ██    ██ ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      ███████  ██   ██ ██   ██  ██████  ██   ██ \n\n", "error");
+    errBox.style.fontSize = "22px"; errBox.style.textAlign = "center"; await delay(2000); location.reload();
+}
 async function bar() {
     const d = addLine("", 'success');
     for (let p = 0; p <= 100; p += 5) { 
-        d.textContent = `DECRYPTING: [${"█".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; 
-        playBeep(550 + p * 2, 'sine', 0.02); 
-        await delay(40); 
+        d.textContent = `DECRYPTING FILES: [${"█".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; 
+        playBeep(400 + p * 2, 'sine', 0.02); await delay(40); 
     }
 }
-async function showEmployeeMenu() {
+async function openMainMenu() {
+    DOM.out.innerHTML = ""; step = 'main_menu';
     await type("========================================", "gray");
-    await type("ДОБРО ПОЖАЛОВАТЬ, " + currentUser.toUpperCase() + "!", "success");
-    await type("ВЫБЕРИТЕ ОПЦИЮ СИСТЕМЫ [1-4]:", "gray");
-    await type("1. КЛЮЧИ ДЕШИФРАТОРА", "success");
-    await type("2. ОТЧЁТЫ ДЕПАРТАМЕНТА", "success");
-    await type("3. ДЕПАРТАМЕНТЫ КОНТРАКТНИКОВ", "success");
-    await type("4. ВЫЙТИ ИЗ АККАУНТА", "success");
+    await type("ACCESS GRANTED // AGENT ANDREY CORE ENVIRONMENT", "success");
+    await type("1. ДЕПАРТАМЕНТЫ КОНТРАКТНИКОВ", "success");
+    await type("2. СЕТЕВЫЕ ПРОТОКОЛЫ ОПЕРАТОРОВ (ТОС)", "success");
+    await type("3. ТЕРМИНАЛЬНЫЙ ВЫХОД", "success");
     await type("========================================", "gray");
-    ask('ВЫБЕРИТЕ ПУНКТ (1-4):', 'menu', false);
+    ask('ENTER COMMAND (1-3):', 'main_menu', false);
 }
 
-async function showContractorsDepartmentMenu() {
-    await type("=== СЕТЕВОЕ ОКРУЖЕНИЕ КОНТРАКТНИКОВ ===", "success");
-    addLine("1. Департамент L.a.S", "success");
-    addLine("2. Департамент T.F.B", "success");
-    addLine("3. НАЗАД В ГЛАВНОЕ МЕНЮ", "gray");
-    ask('ВЫБЕРИТЕ ПОДРАЗДЕЛ (1-3):', 'contractors_menu', false);
+// ИСПРАВЛЕНО: Добавлен официальный Департамент Re-Union в список контрактников!
+async function showContractorsMenu() {
+    DOM.out.innerHTML = ""; step = 'contractors_menu';
+    await type("=== ДЕПАРТАМЕНТЫ КОНТРАКТНИКОВ PMC ATLANTIS ===", "success");
+    addLine("1. Служба Безопасности L.a.S Network", "gray");
+    addLine("2. Спецотряд SHF (Secret Highly Fighters)", "gray");
+    addLine("3. Департамент Re-Union (НИИ Японии)", "success"); // Новая лорная интеграция!
+    addLine("4. Назад в Главное Меню", "gray");
+    ask('ВЫБЕРИТЕ ВЕДОМСТВО (1-4):', 'contractors_menu', false);
 }
 
-function startAndreyPhase1() {
-    DOM.out.innerHTML = "";
-    err("⚠️ КРИПТОГРАФИЧЕСКИЙ ТЕСТ: ИМПУЛЬСНЫЙ СДВИГ ЧАСТОТ! ФАЗА 1/4");
-    let numParts = Array.from({length: 4}, () => Math.floor(Math.random() * 9) + 1);
-    let rawNumberStr = numParts.join("");
-    let shift = Math.floor(Math.random() * 2) + 1; 
-    
-    targetWord = numParts.map(n => (n + shift) % 10).join("");
-    
-    addLine(`>>> ИСХОДНЫЙ СИГНАЛ:   [ ${rawNumberStr} ]`, "error");
-    addLine(`>>> ПОПРАВКА СДВИГА:  [ +${shift} К КАЖДОЙ ЦИФРЕ ОТДЕЛЬНО ]`, "gray");
-    ask('ВВЕДИТЕ ДЕКОД-ИМПУЛЬС:', 'andrey_p1_check', false);
+async function showOperatorsMenu() {
+    DOM.out.innerHTML = ""; step = 'operators_menu';
+    await type("=== СЕТЕВЫЕ ПРОТОКОЛЫ ОПЕРАТОРОВ (ТОС) ===", "success");
+    addLine("1. Лог оператора: BILL [АКТИВЕН]", "success");
+    addLine("2. Лог оператора: SIN [НЕДОСТУПНО]", "gray");
+    addLine("3. Назад в Главное Меню", "gray");
+    ask('ВЫБЕРИТЕ ОПЕРАТОРА (1-3):', 'operators_menu', false);
+}
+// ИСПРАВЛЕНО: Полностью изменён логин Билла — оставлен строго один раздел Пароли!
+async function showBillMenu() {
+    DOM.out.innerHTML = ""; step = 'bill_menu';
+    await type("=== ТАКТИЧЕСКИЙ ПРОТОКОЛ ОПЕРАТОРА: BILL ===", "success");
+    addLine("1. ПАРОЛИ К КОРНЕВЫМ СЕРВЕРАМ MGF", "success"); // Единственный рабочий раздел
+    addLine("2. Назад к списку операторов", "gray");
+    ask('ВЫБЕРИТЕ РАЗДЕЛ (1-2):', 'bill_menu', false);
+}
+
+// Запуск Фазы 1 взлома Паролей Билла
+function startBillPasswordHacking1() {
+    step = 'bill_h_1'; DOM.out.innerHTML = "";
+    err("⚠️ ВЗЛОМ КРИПТОКЛЮЧЕЙ BILL: ФАЗА 1/3 (СДВИГ ЧАСТОТЫ РАДАРА)");
+    let n1 = Math.floor(Math.random() * 5) + 3; let n2 = Math.floor(Math.random() * 4) + 2;
+    targetWord = (n1 * n2).toString();
+    addLine(`>>> КВАНТОВЫЙ ШИФР: [ ПОТОК ${n1} ГГц ]`, "error");
+    addLine(`>>> КОЭФФИЦИЕНТ:   [ МАТРИЦА x${n2} ]`, "gray");
+    ask('ВВЕДИТЕ ДЕКОД-МАРКЕР (УМНОЖЕНИЕ):', 'bill_h_1', false);
     clearTimeout(wordTimer);
-    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 1. КАНАЛ СБРОШЕН."), 12000);
+    wordTimer = setTimeout(() => terminalScramblerDie("🚨 ТАЙМАУТ ВЗЛОМА. ЗАЩИТА BILL БЛОКИРОВАЛА ЧАСТОТУ."), 35000);
 }
 
-function startAndreyPhase2() {
-    clearTimeout(wordTimer);
-    addLine(">>> ПОТОК СДВИГА СИНХРОНИЗИРОВАН.", "success");
-    err("🚨 ТЕСТ ЗРИТЕЛЬНОЙ МАТРИЦЫ: СЛЕПОЕ ПЯТНО! ФАЗА 2/4");
-    
-    let chars = "ABCXYZ12345";
-    let flashCode = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-    targetWord = flashCode;
-    
-    const d = addLine(`>>> МГНОВЕННЫЙ МАРКЕР ДОСТУПА: [ ${flashCode} ]`, "error");
-    playBeep(1100, 'sine', 0.15);
-    
+function startBillPasswordHacking2() {
+    step = 'bill_h_2'; err("⚠️ ВЗЛОМ КРИПТОКЛЮЧЕЙ BILL: ФАЗА 2/3 (ВИЗУАЛЬНЫЙ ЗАХВАТ ПНВ)");
+    let chars = "ATLANTIS77";
+    let code = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    targetWord = code;
+    const d = addLine(`>>> МГНОВЕННЫЙ КЛЮЧ ЯДРА: [ ${code} ]`, "error");
     setTimeout(() => {
-        d.textContent = `>>> МГНОВЕННЫЙ МАРКЕР ДОСТУПА: [ СКРЫТО СИСТЕМОЙ ]`;
-        ask('ВВЕДИТЕ КОД ПО ПАМЯТИ:', 'andrey_p2_check', false);
+        d.textContent = `>>> МГНОВЕННЫЙ КЛЮЧ ЯДРА: [ СКРЫТО ИМПУЛЬСОМ ]`;
+        ask('ВВЕДИТЕ КЛЮЧ ПО ПАМЯТИ:', 'bill_h_2', false);
     }, 1500);
-    
     clearTimeout(wordTimer);
-    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 2. СЕТЬ ЗАБЛОКИРОВАНА."), 12000);
+    wordTimer = setTimeout(() => terminalScramblerDie("🚨 ТАЙМАУТ ВЗЛОМА. МАТРИЦА СБРОШЕНА."), 35000);
+}
+function startBillPasswordHacking3() {
+    step = 'bill_h_3'; err("⚠️ ВЗЛОМ КРИПТОКЛЮЧЕЙ BILL: ФАЗА 3/3 (СПЕКТРАЛЬНЫЙ АНАЛИЗАТОР)");
+    let pulses = Math.floor(Math.random() * 5) + 4; targetWord = pulses.toString();
+    let wave = "▲ ".repeat(pulses);
+    addLine(`>>> СИГНАЛ ДЕШИФРАТОРА: [ ${wave}]`, "error");
+    addLine(`>>> СКОЛЬКО ИМПУЛЬСОВ \"▲\" СИНХРОНИЗИРОВАНО В ЦЕПИ?`, "gray");
+    ask('ВВЕДИТЕ ЧИСЛО ИМПУЛЬСОВ:', 'bill_h_3', false);
+    clearTimeout(wordTimer);
+    wordTimer = setTimeout(() => terminalScramblerDie("🚨 ТАЙМАУТ СИНХРОНИЗАЦИИ. БЛОКИРОВКА."), 35000);
 }
 
-function startAndreyPhase3() {
-    clearTimeout(wordTimer);
-    addLine(">>> МАТРИЦА ПАМЯТИ ПОДТВЕРЖДЕНА.", "success");
-    err("🚨 БИОМЕТРИЧЕСКИЙ АНАЛИЗ ЧАСТОТНЫХ ВОЛН! ФАЗА 3/4");
-    
-    let peaksCount = Math.floor(Math.random() * 4) + 2; 
-    targetWord = peaksCount.toString();
-    
-    let wave = "_";
-    for(let i=0; i<peaksCount; i++) {
-        wave += "/\\_";
-        if(Math.random() > 0.5) wave += "__";
-    }
-    
-    addLine(`>>> СНЯТИЕ ПОКАЗАТЕЛЕЙ ВОЛНЫ: [ ${wave} ]`, "error");
-    addLine(`>>> СКОЛЬКО ЧАСТОТНЫХ ПИКОВ (ВСПЛЕСКОВ \"/\\\") НАХОДИТСЯ НА ГРАФИКЕ?`, "gray");
-    ask('ВВЕДИТЕ КОЛИЧЕСТВО ПИКОВ:', 'andrey_p3_check', false);
-    clearTimeout(wordTimer);
-    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 3. ОПЕРАЦИЯ ОТМЕНЕНА."), 12000);
+// ИСПРАВЛЕНО: Финальная награда выдает рутовый Логин: Base и Пароль: ATLANTIS111
+async function successBillPasswordHacking() {
+    clearTimeout(wordTimer); DOM.out.innerHTML = ""; await bar();
+    await type("===================================================", "success");
+    await type(">>> ДЕШИФРАЦИЯ КОРНЕВЫХ СЕРВЕРОВ MGF ЗАВЕРШЕНА УСПЕШНО!", "success");
+    await type(">>> СИСТЕМА ИЗВЛЕКЛА ГЛАВНЫЕ АДМИНИСТРАТИВНЫЕ ДАННЫЕ:", "success");
+    await type("---------------------------------------------------", "gray");
+    await type("🔓 Логин:  Base", "success");
+    await type("🔓 Пароль: ATLANTIS111", "success");
+    await type("---------------------------------------------------", "gray");
+    await type(">>> ПРИМЕЧАНИЕ: Используйте эти данные для рутового прохода.", "gray");
+    await type("===================================================", "success");
+    await delay(7000);
+    showBillMenu();
 }
-
-function startAndreyPhase4() {
-    clearTimeout(wordTimer);
-    addLine(">>> ЧАСТОТЫ ВОЛН ЗАФИКСИРОВАНЫ.", "success");
-    err("🚨 ОКОНЧАТЕЛЬНАЯ ПРОВЕРКА КЛЮЧА ДЕШИФРАТОРА! ФАЗА 4/4");
-    
-    chosenKeyIdx = Math.floor(Math.random() * CRYPTO_KEYS.length);
-    targetWord = CRYPTO_KEYS[chosenKeyIdx];
-    
-    addLine(`>>> ВВЕДИТЕ РАСШИФРОВАННЫЙ КЛЮЧ ШИФРАТОРА №${chosenKeyIdx + 1}:`, "error");
-    ask('ВВЕДИТЕ КЛЮЧ:', 'andrey_p4_check', false);
-    clearTimeout(wordTimer);
-    wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 4. СИСТЕМА ДЕАКТИВИРОВАНА."), 15000);
-}
-
-async function displayEncryptedReports() {
-    clearTimeout(wordTimer);
-    await type(">>> ВСЕ ДЕПАРТАМЕНТСКИЕ ТЕСТЫ УСПЕШНО ПРОЙДЕНЫ.", "success");
-    await bar();
-    await type("=== ДОСТУПНЫЕ ДОКУМЕНТЫ АРХИВА ДЕПАРТАМЕНТА ===", "success");
-    
-    correctReportOption = Math.floor(Math.random() * 10) + 1; 
-    for (let i = 1; i <= 10; i++) {
-        if (i === correctReportOption) {
-            addLine(`[ ПУНКТ №${i} ] — ЗАШИФРОВАННЫЙ АРХИВ: [ WE-30 ]`, "gray");
-        } else {
-            addLine(`[ ПУНКТ №${i} ] — ЗАШИФРОВАННЫЙ АРХИВ: [ ### ]`, "gray");
-        }
-        await delay(50);
-    }
-    await type("========================================", "success");
-    ask('ВВЕДИТЕ НОМЕР ПУНКТА ДЛЯ ЗАГРУЗКИ АРХИВА:', 'select_report', false);
-}
-
-async function startKeyGame() {
-    step = 'game'; stage = 0; DOM.out.innerHTML = "";
-    await type(">>> ИНИЦИАЛИЗАЦИЯ КРИПТОГРАФИЧЕСКОГО АНАЛИЗАТОРА...", "gray");
-    for(let i=0; i<CRYPTO_KEYS.length; i++) { addLine(`КЛЮЧ №${i+1}: [ ЗАСЕКРЕЧЕНО // ТРЕБУЕТСЯ ДЕШИФРАЦИЯ ]`, "error"); }
-    await delay(500);
-    await type(">>> НАЖИМАЙТЕ [ENTER] ДЛЯ ФИКСАЦИИ И РАСШИФРОВКИ ПАКЕТОВ!", "gray"); nextStage();
-}
-function nextStage() {
-    if (stage >= 3) { endKeyGame(); return; }
-    const st = ["OPENING SECURE CRYPTO CHANNEL...", "DECRYPTING KEY STREAMS...", "PARSING BASE CODES..."];
-    addLine(st[stage], "success"); const d = addLine("", "gray");
-    gameInterval = setInterval(() => {
-        let ch = "0123456789ABCDEFXYZ!@#%", hex = Array.from({length: 8}, () => ch[Math.floor(Math.random() * ch.length)]).join("");
-        d.textContent = `[DECRYPT KEY FLOW #${stage + 1}]: ` + hex; playBeep(400, 'sine', 0.005);
-    }, 60);
-    DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus();
-}
-async function endKeyGame() {
-    clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true; await bar();
-    await type(">>> ДЕШИФРАЦИЯ ЗАВЕРШЕНА! УСПЕШНЫЙ П ПЕРЕХВАТ ДАННЫХ:", "success");
-    await type("----------------------------------------", "gray");
-    for(let i = 0; i < CRYPTO_KEYS.length; i++) { addLine(`КЛЮЧ №${i + 1}: [ ${CRYPTO_KEYS[i]} ]`, "success"); }
-    await type("----------------------------------------", "gray");
-    await type("🚨 ВНИМАНИЕ: ЗАПИШИТЕ ИЛИ СФОТКАЙТЕ ЭТИ КЛЮЧИ СЕЙЧАС!", "error"); await type("ЭКРАН БУДЕТ ОЧИЩЕН ЧЕРЕЗ 8 СЕКУНД...", "gray");
-    setTimeout(() => { DOM.out.innerHTML = ""; showEmployeeMenu(); }, 8000);
-}
-async function startSpeedGame() { step = 'speed_game'; stage = 0; document.body.classList.add('alarm'); playBeep(220, 'sawtooth', 0.5); playBeep(180, 'sawtooth', 0.5); err("⚠️ CRITICAL SECURITY ALERT: FOREIGN IP DETECTED!"); await delay(600); await type(">>> АКТИВИРОВАНА СИСТЕМА ЭКСТРЕННОЙ БЛОКИРОВКИ БАЗЫ ДАННЫХ!", "error"); await type(">>> ИСКАЖЕНИЕ ТРАФИКА! ВВОДИТЕ СЛОВА СТРОГО ЗАДОМ НАПЕРЕД!", "error"); await delay(300); nextSpeedWord(); }
-function nextSpeedWord() { if (stage >= 3) { successSpeedGame(); return; } const words = ["OVERRIDE", "DECRYPT", "BYPASS", "INTRUDER", "EXPLOIT"]; const rawWord = words[Math.floor(Math.random() * words.length)]; targetWord = rawWord.split("").reverse().join(""); addLine(`[ФАЗА 1 - ЭТАП ${stage + 1}/3] ИСХОДНЫЙ КОД: ${rawWord}`, "error"); ask('ВВЕДИТЕ РЕВЕРС-КОД:', 'speed_game', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ПРЕВЫШЕНО ВРЕМЯ ОЖИДАНИЯ ФАЗЫ 1. ЛОКДАУН."), 6000); }
-async function successSpeedGame() { clearTimeout(wordTimer); document.body.classList.remove('alarm'); await type(">>> КОНТРАТАКА ОТРАЖЕНА! ЗАЩИТА БАЗЫ ДАННЫХ СЛОМАНА.", "success"); await delay(600); await type("[ШТАБ]: Узел связи перехвачен. Инициализация аудио-протокола...", "success"); await delay(1500); await type("[ШТАБ]: Ахх... ну да. Молодец, гуд... гуд...", "success"); await delay(1000); await type("[ШТАБ]: Признаться, я до последнего думал, что наши безопасники тебя отрубят. Но ты упрямый.", "success"); await delay(1200); await type("[ШТАБ]: Давай начистоту. Что конкретно ты хочешь здесь найти?", "success"); await delay(800); DOM.term.classList.add('shake'); playBeep(90, 'sawtooth', 0.6); playBeep(70, 'triangle', 0.6); setTimeout(() => DOM.term.classList.remove('shake'), 600); await type("[ШТАБ]: Ты сейчас ковыряешься в закрытом секторе и ОЧЕНЬ СИЛЬНО нам мешаешь! Для чего всё это?", "error"); await delay(2000); await type("[ШТАБ]: Впрочем, мне плевать на твои мотивы. Мы тебя запеленговали.", "success"); await delay(800); await type("[ШТАБ]: Перехожу на ручной протокол изоляции. Прощай, Агент.", "error"); await delay(1200); startPhaseTwo(); }
-async function startPhaseTwo() { step = 'phase2'; stage = 0; document.body.classList.add('alarm'); err("🚨 АВАРИЙНАЯ БЛОКИРОВКА СЕТЕВОГО ОКРУЖЕНИЯ! ФАЗА 2"); await delay(600); await type(">>> ШТАБ ИЗОЛИРУЕТ НАШ IP! П ПЕРЕХВАТЫВАЙТЕ КООРДИНАТЫ УЗЛОВ!", "error"); nextPhaseTwoNode(); }
-function nextPhaseTwoNode() { if (stage >= 4) { startPhaseThree(); return; } const letters = ["A", "B", "C", "D", "X", "Y"]; const numbers = ["1", "2", "3", "4", "5"]; targetWord = letters[Math.floor(Math.random() * letters.length)] + numbers[Math.floor(Math.random() * numbers.length)]; addLine(`[ФАЗА 2 - УЗЕЛ ${stage + 1}/4] КАНАЛ СВЯЗИ: МАТРИЦА ${targetWord}`, "error"); const timeLimit = 5000 - (stage * 1000); ask('ВВЕДИТЕ КООРДИНАТУ:', 'phase2', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 МАТРИЧНАЯ БЛОКИРОВКА ЗАВЕРШЕНА. ВЫ ОТКЛЮЧЕНЫ."), timeLimit); }
-async function startPhaseThree() { step = 'phase3'; stage = 0; addLine(">>> СЕТЕВОЙ КОНТУР ФАЗЫ 2 СТАБИЛИЗИРОВАН.", "success"); await delay(500); await type("[ШТАБ]: С-Система... потеряна... Запуск протокола ВЫЖИГАНИЯ ЯДРА...", "error"); await type("[ШТАБ]: Гори в аду, Агент.", "error"); await delay(800); err("🚨 ВНИМАНИЕ: ЗАПУЩЕН ПРОТОКОЛ ПОЛНОГО СТИРАНИЯ ЯДРА СЕРВЕРА! ФАЗА 3"); await delay(600); nextPhaseThreeNode(); }
-function nextPhaseThreeNode() { if (stage >= 3) { startPhaseFour(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let rd = Array.from({length: 3}, () => Math.floor(Math.random() * 10)); targetWord = rd.join(""); const d = addLine(`[ФАЗА 3 - КЛЮЧ ЯДРА ${stage + 1}/3] ЧАСТОТА: ` + targetWord, "success"); playBeep(900, 'sine', 0.1); setTimeout(() => { d.textContent = `[ФАЗА 3 - КЛЮЧ ЯДРА ${stage + 1}/3] ЧАСТОТА: [СКРЫТО]`; ask('ВВЕДИТЕ СИНХРО-ЧАСТОТУ:', 'phase3', false); }, 2500); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ЯДРО ВЫЖЖЕНО. ОПЕРАЦИЯ ПРОВАЛЕНА."), 6000); }
-async function startPhaseFour() { step = 'phase4'; stage = 0; addLine(">>> ЧАСТОТЫ ЯДРА ФАЗЫ 3 СИНХРОНИЗИРОВАНЫ.", "success"); await delay(600); err("🚨 АЛАРМ: ШТАБ ВКЛЮЧИЛ АУДИО-ГЛУШИЛКУ! ФАЗА 4"); await type(">>> ПОВТОРЯЙТЕ СЕРИИ СИГНАЛОВ КЛАВИШАМИ H (ВЫСОКИЙ) И L (НИЗКИЙ)!", "error"); nextPhaseFourAudio(); }
-function nextPhaseFourAudio() { if (stage >= 3) { startPhaseFive(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let seq = []; for(let i=0; i<3+stage; i++) { seq.push(Math.random() > 0.5 ? "H" : "L"); } targetWord = seq.join(""); addLine(`[ФАЗА 4 - СИГНАЛ ${stage + 1}/3] ВОСПРОИЗВЕДЕНИЕ...`, "error"); triggerAudioChain(targetWord, 0); }
-function triggerAudioChain(w, i) { if(i >= w.length) { addLine(">>> ПОВТОРИТЕ ПОСЛЕДОВАТЕЛЬНОСТЬ (ПРИМЕР: HLHH):", "gray"); ask('ВВОД СИГНАЛА:', 'phase4', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => scramblerDie(), 5000); return; } const currentLetter = w[i].toUpperCase(); const frequency = currentLetter === "H" ? 1500 : 300; playBeep(frequency, 'sine', 0.2); setTimeout(() => triggerAudioChain(w, i+1), 650); }
-async function startPhaseFive() { step = 'phase5'; stage = 0; addLine(">>> ЗВУКОВОЙ КАНАЛ СИНХРОНИЗИРОВАН.", "success"); await delay(600); err("🚨 КРИТИЧЕСКИЙ DDOS-ШТОРМ! СЕРВЕР ПЕРЕГРУЖЕН! ФАЗА 5"); await type(">>> СКАНИРУЙТЕ БИНАРНЫЕ СТРОКИ И НАХОДИТЕ АНОМАЛИЮ!", "error"); nextPhaseFiveVirus(); }
-function nextPhaseFiveVirus() { if (stage >= 3) { startPhaseSix(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let len = 8 + stage * 2; let baseArr = Array.from({length: len}, () => Math.random() > 0.5 ? "1" : "0"); let normal = baseArr.join(""); let anomalyArr = [...baseArr]; for(let i = 0; i < 3; i++) { anomalyArr[i] = anomalyArr[i] === "1" ? "0" : "1"; } let anomaly = anomalyArr.join(""); let anomalyIdx = Math.floor(Math.random() * 4); let lines = []; for(let i=0; i<4; i++) { if(i === anomalyIdx) lines.push(anomaly); else lines.push(normal); } targetWord = (anomalyIdx + 1).toString(); addLine(`[ФАЗА 5 - ПОТОК ${stage + 1}/3] СКАНИРОВАНИЕ ПАКЕТОВ:`, "error"); for(let i=0; i<4; i++) addLine(`${i+1}: ${lines[i]}`, "gray"); ask('ВВЕДИТЕ НОМЕР АНОМАЛЬНОЙ СТРОКИ:', 'phase5', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТЕРМИНАЛ КРАШНУЛСЯ ПОД DDOS-УДАРОМ."), 5000); }
-async function startPhaseSix() { step = 'phase6'; stage = 0; addLine(">>> ПОТОКИ ДАННЫХ ОЧИЩЕНЫ ОТ ВИРУСОВ.", "success"); await delay(600); err("🚨 СЕТЬ РАЗВАЛИВАЕТСЯ НА ЧАСТИ! ФИНАЛЬНАЯ МАРШРУТИЗАЦИЯ! ФАЗА 6"); await type(">>> ПРОВОДИТЕ ПАКЕТ СТРОГО ЧЕРЕЗ ОТКРЫТЫЕ УЗЛЫ СВЯЗИ!", "error"); nextPhaseSixRoute(); }
-function nextPhaseSixRoute() { if (stage >= 3) { endAllGamesSuccess(); return; } let ok = Math.random() > 0.5 ? "A" : "B"; targetWord = ok; addLine(`[ФАЗА 6 - ШЛЮЗ ${stage + 1}/3] АНАЛИЗ МАРШРУТОВ:`, "error"); addLine(`[МАРШРУТ А]: ` + (ok === "A" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "A" ? "success" : "error"); addLine(`[МАРШРУТ Б]: ` + (ok === "B" ? "ОТКРЫТ [READY]" : "ЗАБЛОКИРОВАН [BLOCKED]"), ok === "B" ? "success" : "error"); ask('ВЫБЕРИТЕ ОТКРЫТЫЙ МАРШРУТ (А / Б):', 'phase6', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ПАКЕТ СГОРЕЛ В РАЗОРВАННОЙ СЕТИ."), 3500); }
-
-async function endAllGamesSuccess() {
-    clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar();
-    await type(">>> ВСЕ 6 ФАЗ ОБХОДА ЗАВЕРШЕНЫ С ПОЛНЫМ ТРИУМФОМ!", "success");
-    await type(">>> КОРНЕВОЙ ДОСТУП ВЫРВАН. СЕТЬ ШТАБА АТЛАНТИСА ПОДАВЛЕНА.", "success");
-    await type("===================================================", "gray");
-    await type(">>> НАЙДЕНЫ ПАРОЛИ К СЛЕД. ДЕПАРТАМЕНТАМ:", "success");
-    await type("Департамент L.a.S 368", "success");
-    await type("Департамент T.F.B 868", "success");
-    await type("===================================================", "gray");
-    await delay(2500);
-    await type(">>> ИНИЦИАЛИЗАЦИЯ ЗАЩИЩЕННОГО ПЕРЕНАПРАВЛЕНИЯ К СЕРВЕРУ...", "gray");
-    await delay(3000); 
-    window.location.href = "https://google.com";
-}
-DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
+DOM.inp.oninput = () => { DOM.view.textContent = DOM.inp.value; };
 DOM.inp.onkeydown = async (e) => {
     if (e.key !== 'Enter') return;
-    if (step === 'game') { clearInterval(gameInterval); playBeep(900, 'square', 0.1); addLine(">>> УЗЕЛ СЕГМЕНТА ЗАФИКСИРОВАН.", "success"); stage++; await delay(400); nextStage(); return; }
+    e.preventDefault(); initAudio(); 
+
     const v = DOM.inp.value, cv = v.trim(); if (!v) return;
-
-    if (step === 'speed_game' && cv.toLowerCase() === 'skipall') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.3); addLine(">>> MASTER CHEAT ACTIVE: SKIPPING ALL 6 PHASES!", "success"); endAllGamesSuccess(); return; }
-
-    if (step === 'speed_game' || step === 'phase2' || step === 'phase3' || step === 'phase4' || step === 'phase5' || step === 'phase6') {
-        if (cv.toLowerCase() === 'skip1' && step === 'speed_game') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 1", "success"); successSpeedGame(); return; }
-        if (cv.toLowerCase() === 'skip2' && step === 'phase2') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 2", "success"); startPhaseThree(); return; }
-        if (cv.toLowerCase() === 'skip3' && step === 'phase3') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 3", "success"); startPhaseFour(); return; }
-        if (cv.toLowerCase() === 'skip4' && step === 'phase4') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 4", "success"); startPhaseFive(); return; }
-        if (cv.toLowerCase() === 'skip5' && step === 'phase5') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ОБХОД ФАЗЫ 5", "success"); startPhaseSix(); return; }
-        if (cv.toLowerCase() === 'skip6' && step === 'phase6') { clearTimeout(wordTimer); playBeep(880, 'sine', 0.2); addLine(">>> ЧИТ-КОД АКТИВИРОВАН: ПОЛНЫЙ ВЗЛОМ", "success"); endAllGamesSuccess(); return; }
-
-        if (step === 'speed_game') { if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> СЕГМЕНТ ОБХОДА СТАБИЛИЗИРОВАН.", "success"); stage++; await delay(400); nextSpeedWord(); } else die("ОШИБКА!"); return; }
-        if (step === 'phase2') { if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> КОНТУР УЗЛА ПЕРЕХВАЧЕН И ПЕРЕНАПРАВЛЕН.", "success"); stage++; await delay(400); nextPhaseTwoNode(); } else die("ОШИБКА!"); return; }
-        if (step === 'phase3') { if (cv === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> РЕЗОНАТОР ЯДРА СИНХРОНИЗИРОВАН.", "success"); stage++; await delay(400); nextPhaseThreeNode(); } else die("ОШИБКА!"); return; }
-        if (step === 'phase4') { if (cv.toUpperCase() === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> ЧАСТОТНЫЙ ФИЛЬТР НАСТРОЕН.", "success"); stage++; await delay(400); nextPhaseFourAudio(); } else { await scramblerDie(); } return; }
-        if (step === 'phase5') { if (cv === targetWord) { clearTimeout(wordTimer); playBeep(900, 'square', 0.1); addLine(">>> АНОМАЛЬНЫЙ ПОТОК ФИЛЬТРОВАН.", "success"); stage++; await delay(400); nextPhaseFiveVirus(); } else die("ОШИБКА!"); return; }
-        if (step === 'phase6') { let chk = cv.toUpperCase() === "A" || cv.toUpperCase() === "А" ? "A" : (cv.toUpperCase() === "B" || cv.toUpperCase() === "Б" ? "B" : ""); if (chk === targetWord) { stage++; playBeep(900, 'square', 0.1); addLine(">>> ШЛЮЗ ПРОЙДЕН. ПАКЕТ ДВИЖЕТСЯ ДАЛЬШЕ.", "success"); stage++; await delay(400); nextPhaseSixRoute(); } else die("ОШИБКА!"); return; }
-    }
-
-    DOM.blk.classList.remove('active'); DOM.inp.disabled = true; addLine(DOM.pr.textContent + " " + (isMask ? "*".repeat(v.length) : cv), 'success'); await delay(300);
+    DOM.blk.classList.remove('active'); DOM.inp.disabled = true; 
+    addLine(DOM.pr.textContent + " " + cv, 'success'); await delay(300);
     
     if (step === 'login') {
-        const inputLogin = cv.toLowerCase();
-        if (inputLogin === 'base') { ask('ENTER DATABASE KEY:', 'base_key', true); }
-        else if (CFG.USERS[inputLogin] !== undefined) { currentUser = inputLogin; ask('ENTER PASSKEY:', 'pass', true); }
-        else { err("DENIED: UNKNOWN ID."); await delay(1000); ask('AGENT ID / EMPLOYEE:', 'login', false); }
-    } else if (step === 'base_key') {
-        if (cv === 'ATLANTIS111') startSpeedGame();
-        else { err("ACCESS DENIED."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
-    } else if (step === 'pass') {
-        if (cv === CFG.USERS[currentUser]) { await bar(); showEmployeeMenu(); }
-        else { err("SECURITY VIOLATION."); await delay(1500); ask('AGENT ID / EMPLOYEE:', 'login', false); }
-    } else if (step === 'menu') {
-        if (cv === '1') { startKeyGame(); } 
-        else if (cv === '2') { startAndreyPhase1(); } 
-        else if (cv === '3') { DOM.out.innerHTML = ""; showContractorsDepartmentMenu(); } 
-        else if (cv === '4') { await type(">>> ОТКЛЮЧЕНИЕ...", "gray"); await delay(1000); DOM.out.innerHTML = ""; ask('AGENT ID / EMPLOYEE:', 'login', false); }
-        else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); ask('ВЫБЕРИТЕ ПУНКТ (1-4):', 'menu', false); }
+        if (cv === CFG.REAL_TOKEN) { await bar(); await openMainMenu(); } 
+        else { err("ACCESS DENIED. INVALID ACCESS KEY."); await delay(1500); ask('ENTER SECURITY ACCESS KEY:', 'login', false); }
     } 
+    else if (step === 'main_menu') {
+        if (cv === '1') showContractorsMenu();
+        else if (cv === '2') showOperatorsMenu();
+        else if (cv === '3') { DOM.out.innerHTML = ""; step = 'login'; ask('ENTER SECURITY ACCESS KEY:', 'login', false); }
+        else { err("НЕВЕРНАЯ КОМАНДА."); await delay(1000); openMainMenu(); }
+    }
     else if (step === 'contractors_menu') {
-        if (cv === '1') { ask('ВВЕДИТЕ ТОКЕН ДОСТУПА L.a.S:', 'check_las_pass', true); }
-        else if (cv === '2') { ask('ВВЕДИТЕ ТОКЕН ДОСТУПА T.F.B:', 'check_tfb_pass', true); }
-        else { DOM.out.innerHTML = ""; showEmployeeMenu(); }
+        if (cv === '4') openMainMenu();
+        else if (cv === '1' || cv === '2' || cv === '3') { 
+            err("🚨 ОШИБКА: ДОСТУП ОГРАНИЧЕН КОНТРАКТОМ. ОЖИДАНИЕ ТАКТИЧЕСКИХ ФАЗ СЕРВЕРА..."); 
+            await delay(1500); showContractorsMenu(); 
+        } else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); showContractorsMenu(); }
     }
-    else if (step === 'check_las_pass') {
-        if (cv === '368') {
-            await type(">>> ТОКЕН СЕТИ ВЕРИФИЦИРОВАН. ДОСТУП ПРЕДОСТАВЛЕН.", "success"); await bar();
-            window.location.href = "https://github.io";
-        } else {
-            err("🚨 ОШИБКА ДОСТУПА: НЕВЕРНЫЙ КОРНЕВОЙ ТОКЕН L.a.S"); await delay(1500); DOM.out.innerHTML = ""; showContractorsDepartmentMenu();
-        }
+    else if (step === 'operators_menu') {
+        if (cv === '1') showBillMenu();
+        else if (cv === '3') openMainMenu();
+        else { err("РАЗДЕЛ ЗАБЛОКИРОВАН."); await delay(1000); showOperatorsMenu(); }
     }
-    else if (step === 'check_tfb_pass') {
-        if (cv === '868') {
-            await type(">>> ТОКЕН СЕТИ ВЕРИФИЦИРОВАН. ДОСТУП ПРЕДОСТАВЛЕН.", "success"); await bar();
-            window.location.href = "https://github.io";
-        } else {
-            err("🚨 ОШИБКА ДОСТУПА: НЕВЕРНЫЙ КОРНЕВОЙ ТОКЕН T.F.B"); await delay(1500); DOM.out.innerHTML = ""; showContractorsDepartmentMenu();
-        }
+    else if (step === 'bill_menu') {
+        if (cv === '1') startBillPasswordHacking1();
+        else if (cv === '2') showOperatorsMenu();
+        else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); showBillMenu(); }
     }
-    else if (step === 'andrey_p1_check') {
-        if (cv === targetWord) { startAndreyPhase2(); } 
-        else { die("🚨 СДВИГ ИМПУЛЬСА НЕВЕРЕН. СЕТЕВОЙ ШЛЮЗ ЗАБЛОКИРОВАН."); }
-    } else if (step === 'andrey_p2_check') {
-        if (cv.toUpperCase() === targetWord) { startAndreyPhase3(); } 
-        else { die("🚨 ОШИБКА ДЕТЕКЦИИ СЛЕПОГО ПЯТНА. СЕССИЯ АННУЛИРОВАНА."); }
-    } else if (step === 'andrey_p3_check') {
-        if (cv === targetWord) { startAndreyPhase4(); } 
-        else { die("🚨 АКУСТИЧЕСКИЙ ПОДГЛЯДЫВАТЕЛЬ ОБНАРУЖЕН. БЛОКИРОВКА."); }
-    } 
-    else if (step === 'andrey_p4_check') {
-        if (cv.toUpperCase() === targetWord) { await displayEncryptedReports(); } 
-        else { die("🚨 КОД ШИФРАТОРА НЕ СОВПАЛ. ДОСТУП В АРХИВ ОКОНЧАТЕЛЬНО ЗАКРЫТ."); }
+    else if (step === 'bill_h_1') {
+        if (cv === targetWord) startBillPasswordHacking2(); else await terminalScramblerDie("🚨 ОШИБКА ЧАСТОТЫ.");
     }
-    else if (step === 'select_report') {
-        if (cv === correctReportOption.toString()) {
-            await type(">>> ИДЕНТИФИКАЦИЯ АРХИВА... УСПЕШНО.", "success"); await bar();
-            window.location.href = "https://google.com";
-        } else {
-            err("🚨 КРИТИЧЕСКАЯ ОШИБКА: ДАННЫЙ АРХИВ ЗАБЛОКИРОВАН ИЛИ ПОВРЕЖДЕН."); await delay(1500); showEmployeeMenu();
-        }
+    else if (step === 'bill_h_2') {
+        if (cv.toUpperCase() === targetWord) startBillPasswordHacking3(); else await terminalScramblerDie("🚨 ОШИБКА МАТРИЦЫ.");
+    }
+    else if (step === 'bill_h_3') {
+        if (cv === targetWord) await successBillPasswordHacking(); else await terminalScramblerDie("🚨 ОШИБКА СИНХРОНИЗАЦИИ.");
     }
 };
-document.onclick = () => DOM.inp.disabled || DOM.inp.focus(); window.onload = runBootLogs;
+
+document.onclick = () => { initAudio(); if (DOM.inp.disabled === false) DOM.inp.focus(); };
+window.onload = () => { runBootLogs(); };
 </script>
 </body>
 </html>
