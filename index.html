@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATLANTIS // CORE DATABASE v1.0</title>
+    <title>ATLANTIS // CORE TERMINAL v1.0</title>
     <style>
         :root {
             --glow: #112233;       /* Тактический стальной тёмно-синий текст */
-            --glow-dim: #778899;   /* Серый хаки для рамок */
+            --glow-dim: #778899;   /* Серый хаки для внутренних рамок */
             --bg: #eef2f5;         /* Светло-серый стерильный фон штаба */
             --bg-panel: #ffffff;   /* Чистый белый цвет коробки дисплея */
             --err: #cc0000;        
-            --acc: #0088cc;        /* Синий неон для подтверждённых логов */
+            --acc: #0088cc;        /* Голубой неон Атлантиса */
         }
         /* Жёсткая No-Scroll фиксация экрана */
         html, body {
@@ -176,11 +176,11 @@
 <div class="terminal-box" id="term">
     <div class="header" id="hd">
         <img src="ART_logo.png" class="hub-logo" alt="ATLANTIS LOGO">
-        PMC ATLANTIS // CENTRAL DATABANK CORE SECURITY
+        PMC ATLANTIS // SECURE DATA GATEWAY v1.0
     </div>
     <div id="out"></div>
     <div class="input-line" id="blk">
-        <span class="prompt" id="pr">ENTER SECURITY LOGIN:</span>
+        <span class="prompt" id="pr">ENTER SECURITY ACCESS KEY:</span>
         <div class="input-wrapper">
             <input type="text" id="inp" autocomplete="off" disabled>
             <div class="custom-view" id="view"></div>
@@ -188,17 +188,14 @@
     </div>
 </div>
 <script>
-const CFG = { 
-    USER: "Base",
-    PASS: "ATLANTIS111",
-    SPD: 15 
-};
+// ИСПРАВЛЕНО: Возвращён старый оригинальный ключ входа 324 на один инпут!
+const CFG = { REAL_TOKEN: "324", SPD: 15 };
 const DOM = { 
     term: document.getElementById('term'), inp: document.getElementById('inp'), 
     view: document.getElementById('view'), out: document.getElementById('out'), 
     pr: document.getElementById('pr'), blk: document.getElementById('blk') 
 };
-let step = 'login_user', tempLogin = "", dialogueStage = 0, wordTimer = null;
+let step = 'login', dialogueStage = 0, wordTimer = null, targetWord = "";
 const delay = ms => new Promise(r => setTimeout(r, ms));
 let audioCtx = null;
 
@@ -228,17 +225,17 @@ async function type(txt, cls = "") {
 async function runBootLogs() {
     DOM.out.innerHTML = "";
     const p = [
-        "SYNCHRONIZING RECON SAT-LINKS... SUCCESS", 
+        "SYNCHRONIZING RECON SAT-LINKS... DONE", 
+        "DECRYPTING DEPARTMENT LOGS... LOADED", 
         "ISOLATING ROUTER GATEWAYS... ACTIVE", 
-        "ENFORCING КЕRBEROS FIREWALLS... IMPENETRABLE",
-        "CONNECTING TO ATLANTIS MAIN CONSOLE... SECURE"
+        "ESTABLISHING TAC-COM CONNECTION... SUCCESS"
     ];
     for (let i = 0; i < p.length; i++) {
-        await delay(60 + Math.random() * 60); addLine("[ATLANTIS-SEC] | " + p[i], 'gray');
+        await delay(70 + Math.random() * 70); addLine("[ATLANTIS-NET] | " + p[i], 'gray');
     }
     await delay(300);
-    await type("SYS: КОРНЕВАЯ БАЗА ДАННЫХ АТЛАНТИСА ЗАБЛОКИРОВАНА ВЫСШИМ ШИФРОМ.", "gray");
-    ask('ENTER SECURITY LOGIN:', 'login_user', false);
+    await type("SYS: WELCOME BACK, AGENT ANDREY.", "gray");
+    ask('ENTER SECURITY ACCESS KEY:', 'login', false);
 }
 function ask(p, s, m) { 
     step = s; DOM.pr.textContent = p; DOM.inp.value = DOM.view.textContent = ""; 
@@ -250,34 +247,36 @@ function err(m) {
 }
 async function terminalScramblerDie(m) {
     clearTimeout(wordTimer); DOM.blk.classList.remove('active'); DOM.inp.disabled = true; err(m); await delay(1000);
+    await type("[SYS]: КРИТИЧЕСКАЯ УГРОЗА ВЗЛОМА. СКРАМБЛЕР ВЫЖЕГ ПОРТЫ ПАМЯТИ.", "error"); await delay(1500);
     DOM.out.innerHTML = ""; playBeep(50, 'sawtooth', 2.0); DOM.term.classList.add('shake');
-    const errBox = addLine("\n\n\n\n      ███████  ██████  ██████   ██████  ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      █████    ██████  ██████  ██    ██ ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██████  \n      ███████  ██   ██ ██   ██  ██████  ██   ██ \n\n", "error");
+    const errBox = addLine("\n\n\n\n      ███████  ██████  ██████   ██████  ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      █████    ██████  ██████  ██    ██ ██████  \n      ██       ██   ██ ██   ██ ██    ██ ██   ██ \n      ███████  ██   ██ ██   ██  ██████  ██   ██ \n\n", "error");
     errBox.style.fontSize = "22px"; errBox.style.textAlign = "center"; await delay(2000); location.reload();
 }
 async function bar() {
     const d = addLine("", 'success');
     for (let p = 0; p <= 100; p += 5) { 
-        d.textContent = `DECRYPTING MAIN FRAME ARTIFACTS: [${"█".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; 
+        d.textContent = `DECRYPTING FILES: [${"█".repeat(p/5)}${".".repeat(20-(p/5))}] ${p}%`; 
         playBeep(400 + p * 2, 'sine', 0.02); await delay(40); 
     }
 }
 async function openMainMenu() {
     DOM.out.innerHTML = ""; step = 'main_menu';
     await type("========================================", "gray");
-    await type("ACCESS GRANTED // CENTRAL DATABANK OPERATIONAL ENVIRONMENT", "success");
+    await type("ACCESS GRANTED // AGENT ANDREY CORE ENVIRONMENT", "success");
     await type("1. ДЕПАРТАМЕНТЫ КОНТРАКТНИКОВ", "success");
     await type("2. СЕТЕВЫЕ ПРОТОКОЛЫ ОПЕРАТОРОВ (ТОС)", "success");
-    await type("3. ЗАКРЫТЬ СЕССИЮ БЕЗОПАСНОСТИ", "success");
+    await type("3. ТЕРМИНАЛЬНЫЙ ВЫХОД", "success");
     await type("========================================", "gray");
     ask('ENTER COMMAND (1-3):', 'main_menu', false);
 }
 
+// ИСПРАВЛЕНО: Сохранён Департамент Re-Union в списке контрактников Андрея!
 async function showContractorsMenu() {
     DOM.out.innerHTML = ""; step = 'contractors_menu';
     await type("=== ДЕПАРТАМЕНТЫ КОНТРАКТНИКОВ PMC ATLANTIS ===", "success");
     addLine("1. Служба Безопасности L.a.S Network", "gray");
     addLine("2. Спецотряд SHF (Secret Highly Fighters)", "gray");
-    addLine("3. Департамент Re-Union (НИИ Японии)", "success"); // Тот самый запрашиваемый отдел!
+    addLine("3. Департамент Re-Union (НИИ Японии)", "success"); 
     addLine("4. Назад в Главное Меню", "gray");
     ask('ВЫБЕРИТЕ ВЕДОМСТВО (1-4):', 'contractors_menu', false);
 }
@@ -285,63 +284,103 @@ async function showContractorsMenu() {
 async function showOperatorsMenu() {
     DOM.out.innerHTML = ""; step = 'operators_menu';
     await type("=== СЕТЕВЫЕ ПРОТОКОЛЫ ОПЕРАТОРОВ (ТОС) ===", "success");
-    addLine("1. Лог оператора: BILL [БЛОКИРОВАНО СБ]", "error");
+    addLine("1. Лог оператора: BILL [АКТИВЕН]", "success"); // Снова активен по кнопке 1!
     addLine("2. Лог оператора: SIN [НЕДОСТУПНО]", "gray");
     addLine("3. Назад в Главное Меню", "gray");
     ask('ВЫБЕРИТЕ ОПЕРАТОРА (1-3):', 'operators_menu', false);
 }
+async function showBillMenu() {
+    DOM.out.innerHTML = ""; step = 'bill_menu';
+    await type("=== ТАКТИЧЕСКИЙ ПРОТОКОЛ ОПЕРАТОРА: BILL ===", "success");
+    addLine("1. ПАРОЛИ К КОРНЕВЫМ СЕРВЕРАМ MGF", "success"); // Один раздел Пароли!
+    addLine("2. Назад к списку операторов", "gray");
+    ask('ВЫБЕРИТЕ РАЗДЕЛ (1-2):', 'bill_menu', false);
+}
+
+function startBillPasswordHacking1() {
+    step = 'bill_h_1'; DOM.out.innerHTML = "";
+    err("⚠️ ВЗЛОМ КРИПТОКЛЮЧЕЙ BILL: ФАЗА 1/3 (СДВИГ ЧАСТОТЫ РАДАРА)");
+    let n1 = Math.floor(Math.random() * 5) + 3; let n2 = Math.floor(Math.random() * 4) + 2;
+    targetWord = (n1 * n2).toString();
+    addLine(`>>> КВАНТОВЫЙ ШИФР: [ ПОТОК ${n1} ГГц ]`, "error"); addLine(`>>> КОЭФФИЦИЕНТ:   [ МАТРИЦА x${n2} ]`, "gray");
+    ask('ВВЕДИТЕ ДЕКОД-МАРКЕР (УМНОЖЕНИЕ):', 'bill_h_1', false);
+    clearTimeout(wordTimer); wordTimer = setTimeout(() => terminalScramblerDie("🚨 ТАЙМАУТ."), 35000);
+}
+
+function startBillPasswordHacking2() {
+    step = 'bill_h_2'; err("⚠️ ВЗЛОМ КРИПТОКЛЮЧЕЙ BILL: ФАЗА 2/3 (ВИЗУАЛЬНЫЙ ЗАХВАТ ПНВ)");
+    let chars = "ATLANTIS77"; let code = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    targetWord = code; const d = addLine(`>>> МГНОВЕННЫЙ КЛЮЧ ЯДРА: [ ${code} ]`, "error");
+    setTimeout(() => { d.textContent = `>>> МГНОВЕННЫЙ КЛЮЧ ЯДРА: [ СКРЫТО ИМПУЛЬСОМ ]`; ask('ВВЕДИТЕ КЛЮЧ ПО ПАМЯТИ:', 'bill_h_2', false); }, 1500);
+    clearTimeout(wordTimer); wordTimer = setTimeout(() => terminalScramblerDie("🚨 ТАЙМАУТ."), 35000);
+}
+
+function startBillPasswordHacking3() {
+    step = 'bill_h_3'; err("⚠️ ВЗЛОМ КРИПТОКЛЮЧЕЙ BILL: ФАЗА 3/3 (СПЕКТРАЛЬНЫЙ АНАЛИЗАТОР)");
+    let pulses = Math.floor(Math.random() * 5) + 4; targetWord = pulses.toString(); let wave = "▲ ".repeat(pulses);
+    addLine(`>>> СИГНАЛ ДЕШИФРАТОРА: [ ${wave} ]`, "error"); addLine(`>>> СКОЛЬКО ИМПУЛЬСОВ \"▲\" СИНХРОНИЗИРОВАНО В ЦЕПИ?`, "gray");
+    ask('ВВЕДИТЕ ЧИСЛО ИМПУЛЬСОВ:', 'bill_h_3', false);
+    clearTimeout(wordTimer); wordTimer = setTimeout(() => terminalScramblerDie("🚨 ТАЙМАУТ."), 35000);
+}
+async function successBillPasswordHacking() {
+    clearTimeout(wordTimer); DOM.out.innerHTML = ""; await bar();
+    await type("===================================================", "success");
+    await type(">>> ДЕШИФРАЦИЯ КОРНЕВЫХ СЕРВЕРОВ MGF ЗАВЕРШЕНА УСПЕШНО!", "success");
+    await type(">>> СИСТЕМА ИЗВЛЕКЛА ГЛАВНЫЕ АДМИНИСТРАТИВНЫЕ ДАННЫЕ:", "success");
+    await type("---------------------------------------------------", "gray");
+    await type("🔓 Логин:  Base", "success");
+    await type("🔓 Пароль: ATLANTIS111", "success");
+    await type("---------------------------------------------------", "gray");
+    await type(">>> ПРИМЕЧАНИЕ: Используйте эти данные для рутового прохода.", "gray");
+    await type("===================================================", "success");
+    await delay(7000); showBillMenu();
+}
+
 DOM.inp.oninput = () => { DOM.view.textContent = DOM.inp.value; };
 DOM.inp.onkeydown = async (e) => {
     if (e.key !== 'Enter') return;
     e.preventDefault(); initAudio(); 
-
     const v = DOM.inp.value, cv = v.trim(); if (!v) return;
     DOM.blk.classList.remove('active'); DOM.inp.disabled = true; 
     addLine(DOM.pr.textContent + " " + cv, 'success'); await delay(300);
     
-    // ВХОД ПО ЛОГИНУ 'Base'
-    if (step === 'login_user') {
-        if (cv === CFG.USER) {
-            tempLogin = cv;
-            step = 'login_pass';
-            ask('ENTER SECURITY PASSWORD:', 'login_pass', false);
-        } else {
-            err("INVALID LOGIN INDENTIFIER. SECURITY ALERTED.");
-            await delay(1500); ask('ENTER SECURITY LOGIN:', 'login_user', false);
-        }
+    if (step === 'login') {
+        if (cv === CFG.REAL_TOKEN) { await bar(); await openMainMenu(); } 
+        else { err("ACCESS DENIED. INVALID ACCESS KEY."); await delay(1500); ask('ENTER SECURITY ACCESS KEY:', 'login', false); }
     } 
-    // ВХОД ПО ПАРОЛЮ 'ATLANTIS111'
-    else if (step === 'login_pass') {
-        if (cv === CFG.PASS) {
-            await bar(); 
-            await openMainMenu();
-        } else {
-            err("CRITICAL ERROR: INVALID PASSWORD TOKEN. DATA LOCKDOWN.");
-            await delay(1500); step = 'login_user'; ask('ENTER SECURITY LOGIN:', 'login_user', false);
-        }
-    }
     else if (step === 'main_menu') {
         if (cv === '1') showContractorsMenu();
         else if (cv === '2') showOperatorsMenu();
-        else if (cv === '3') { 
-            DOM.out.innerHTML = ""; step = 'login_user'; 
-            ask('ENTER SECURITY LOGIN:', 'login_user', false); 
-        }
+        else if (cv === '3') { DOM.out.innerHTML = ""; step = 'login'; ask('ENTER SECURITY ACCESS KEY:', 'login', false); }
         else { err("НЕВЕРНАЯ КОМАНДА."); await delay(1000); openMainMenu(); }
     }
     else if (step === 'contractors_menu') {
         if (cv === '4') openMainMenu();
         else if (cv === '1' || cv === '2' || cv === '3') { 
-            err("🚨 СИСТЕМА: ДАННЫЕ ДЕПАРТАМЕНТА АРХИВИРОВАНЫ СБ PMC ATLANTIS."); 
+            err("🚨 ОШИБКА: ДОСТУП ОГРАНИЧЕН КОНТРАКТОМ. ОЖИДАНИЕ ТАКТИЧЕСКИХ ФАЗ СЕРВЕРА..."); 
             await delay(1500); showContractorsMenu(); 
         } else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); showContractorsMenu(); }
     }
     else if (step === 'operators_menu') {
-        if (cv === '3') openMainMenu();
-        else { err("ДАННЫЙ КАНАЛ СВЯЗИ ЗАБЛОКИРОВАН ОФИЦЕРОМ БЕЗОПАСНОСТИ."); await delay(1000); showOperatorsMenu(); }
+        if (cv === '1') showBillMenu();
+        else if (cv === '3') openMainMenu();
+        else { err("РАЗДЕЛ ЗАБЛОКИРОВАН."); await delay(1000); showOperatorsMenu(); }
+    }
+    else if (step === 'bill_menu') {
+        if (cv === '1') startBillPasswordHacking1();
+        else if (cv === '2') showOperatorsMenu();
+        else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); showBillMenu(); }
+    }
+    else if (step === 'bill_h_1') {
+        if (cv === targetWord) startBillPasswordHacking2(); else await terminalScramblerDie("🚨 ОШИБКА ЧАСТОТЫ.");
+    }
+    else if (step === 'bill_h_2') {
+        if (cv.toUpperCase() === targetWord) startBillPasswordHacking3(); else await terminalScramblerDie("🚨 ОШИБКА МАТРИЦЫ.");
+    }
+    else if (step === 'bill_h_3') {
+        if (cv === targetWord) await successBillPasswordHacking(); else await terminalScramblerDie("🚨 ОШИБКА СИНХРОНИЗАЦИИ.");
     }
 };
-
 document.onclick = () => { initAudio(); if (DOM.inp.disabled === false) DOM.inp.focus(); };
 window.onload = () => { runBootLogs(); };
 </script>
