@@ -7,7 +7,7 @@
     <style>
         :root {
             --glow: #ffffff;       /* Чистый белый текст */
-            --bg: #000000;         /* Абсолютно чёрный фон */
+            --bg: #000000;         /* Absolute чёрный фон */
             --bg-panel: #000000;   /* Полностью чёрная внутренняя часть панели */
             --err: #ff1111;        
             --acc: #ffffff;        /* Успешные логи тоже белые */
@@ -102,7 +102,7 @@
             pointer-events: none;
             filter: brightness(0) invert(1); 
         }
-        /* Внутренний независимый скролл-бокс логов */
+        /* Внутреннее независимое окно скролла логов */
         #out {
             flex-grow: 1;
             overflow-y: auto;
@@ -301,7 +301,7 @@ async function showEmployeeMenu() {
 
 async function showContractorsDepartmentMenu() {
     DOM.out.innerHTML = "";
-    await type("=== СЕТЕВОЕ ОДОБРЕНИЕ КОНТРАКТНИКОВ ===", "success");
+    await type("=== СЕТЕВОЕ ОКРУЖЕНИЕ КОНТРАКТНИКОВ ===", "success");
     addLine("1. Департамент L.a.S", "success");
     addLine("2. Департамент T.F.B", "success");
     addLine("3. Департамент Re-Union (НИИ Японии)", "success"); 
@@ -345,7 +345,6 @@ function startAndreyPhase4() {
     ask('ВВЕДИТЕ КЛЮЧ:', 'andrey_p4_check', false);
     clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 4."), 35000);
 }
-// ИСПРАВЛЕНО: Билл мгновенно выдает рутовые ключи после успешной 3-й фазы (минуя 4-ю)!
 async function successBillPasswordExtraction() {
     clearTimeout(wordTimer); DOM.out.innerHTML = ""; await bar();
     await type("===================================================", "success");
@@ -407,17 +406,51 @@ async function startPhaseFive() { step = 'phase5'; stage = 0; addLine(">>> ЗВ�
 function nextPhaseFiveVirus() { if (stage >= 3) { startPhaseSix(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let len = 8 + stage * 2; let baseArr = Array.from({length: len}, () => Math.random() > 0.5 ? "1" : "0"); let normal = baseArr.join(""); let anomalyArr = [...baseArr]; anomalyArr = anomalyArr === "1" ? "0" : "1"; let anomaly = anomalyArr.join(""); let anomalyIdx = Math.floor(Math.random() * 4); let lines = []; for(let i=0; i<4; i++) { if(i === anomalyIdx) lines.push(anomaly); else lines.push(normal); } targetWord = (anomalyIdx + 1).toString(); addLine(`[ФАЗА 5 - ПОТОК ${stage + 1}/3] СКАНИРОВАНИЕ ПАКЕТОВ:`, "error"); for(let i=0; i<4; i++) addLine(`${i+1}: ${lines[i]}`, "gray"); ask('ВВЕДИТЕ НОМЕР АНОМАЛЬНОЙ СТРОКИ:', 'phase5', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 КРАШ."), 35000); }
 async function startPhaseSix() { step = 'phase6'; stage = 0; addLine(">>> ПОТОКИ ДАННЫХ ОЧИЩЕНЫ ОТ ВИРУСОВ.", "success"); await delay(600); err("🚨 СЕТЬ РАЗВАЛИВАЕТСЯ НА ЧАСТИ! ФИНАЛЬНАЯ МАРШРУТИЗАЦИЯ! ФАЗА 6"); nextPhaseSixRoute(); }
 function nextPhaseSixRoute() { if (stage >= 3) { endAllGamesSuccess(); return; } let ok = Math.random() > 0.5 ? "A" : "B"; targetWord = ok; addLine(`[ФАЗА 6 - ШЛЮЗ ${stage + 1}/3] АНАЛИЗ МАРШРУТОВ:`, "error"); addLine(`[МАРШРУТ А]: ` + (ok === "A" ? "ОТКРЫТ" : "БЛОК"), ok === "A" ? "success" : "error"); addLine(`[МАРШРУТ Б]: ` + (ok === "B" ? "ОТКРЫТ" : "БЛОК"), ok === "B" ? "success" : "error"); ask('ВЫБЕРИТЕ МАРШРУТ (А / Б):', 'phase6', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 КРАШ."), 35000); }
-// ИСПРАВЛЕНО: Финал 6-й фазы выдает секретный пароль к Департаменту Re-Union — 868!
-async function endAllGamesSuccess() { 
-    clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar(); 
-    await type(">>> ВСЕ 6 ФАЗ ОБХОДА ЗАВЕРШЕНЫ С ПОЛНЫМ ТРИУМФОМ!", "success"); 
-    await type(">>> КОРНЕВОЙ ДОСТУП ВЫРВАН. СЕТЬ ШТАБА АТЛАНТИСА ПОДАВЛЕНА.", "success"); 
-    await type("===================================================", "gray");
-    await type(">>> НАЙДЕНЫ СЕКРЕТНЫЕ КЛЮЧИ PMC ATLANTIS:", "success");
-    await type("🔓 Департамент L.a.S    :: Маркер 368", "success");
-    await type("🔓 Департамент T.F.B    :: Маркер 868", "success");
-    await type("🔓 Департамент Re-Union :: Маркер 868", "success"); // Наша новая награда!
-    await type("===================================================", "gray");
+// ИСПРАВЛЕНО: Победа в Base запускает ПНВ-перехват Борза с оригинальными картинками фракций!
+async function endAllGamesSuccess() {
+    clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar();
+    DOM.out.innerHTML = ""; playBeep(440, 'sawtooth', 0.3); playBeep(220, 'sawtooth', 0.3);
+    
+    // Перестраиваем шапку под Split-Screen Церберов (CERBERUS_logo.png) и Атлантиса (atlantis.png)
+    document.getElementById('hd').innerHTML = `
+        <div class="split-logos-container" style="display: flex; justify-content: space-around; align-items: center; width: 100%; margin-bottom: 10px;">
+            <div class="split-logo-box" style="display: flex; flex-direction: column; align-items: center; width: 45%;">
+                <img src="CERBERUS_logo.png" class="split-logo-img" style="width: 130px; height: 130px; object-fit: cover; border-radius: 50%; border: 2px solid #00cc33; filter: drop-shadow(0 0 15px #00cc33);" alt="CERB">
+                <span class="split-logo-label" style="font-size: 11px; margin-top: 4px; font-weight: bold; letter-spacing: 2px; color: #00cc33; text-shadow: 0 0 5px #00cc33;">UNIT: CERBERUS</span>
+            </div>
+            <div class="split-logo-box" style="display: flex; flex-direction: column; align-items: center; width: 45%;">
+                <img src="atlantis.png" class="split-logo-img" style="width: 130px; height: 130px; object-fit: cover; border-radius: 50%; border: 2px solid #ffffff; filter: drop-shadow(0 0 15px #ffffff);" alt="ATL">
+                <span class="split-logo-label" style="font-size: 11px; margin-top: 4px; font-weight: bold; letter-spacing: 2px; color: #ffffff; text-shadow: 0 0 5px #ffffff;">INTERCEPT: ATLANTIS</span>
+            </div>
+        </div>
+        <div id="split-title" style="text-align:center; width:100%; font-weight: bold; font-size:14px; letter-spacing:1px;">
+            <span style="color:#00cc33; text-shadow:0 0 5px #00cc33;">CERBERUS NET</span> // <span style="color:#ffffff; text-shadow:0 0 5px #ffffff;">ATLANTIS FRAME OVERRIDE</span>
+        </div>
+    `;
+    
+    DOM.term.style.border = "2px dashed #00cc33"; DOM.term.classList.add('shake');
+    err("⚠️ ВНИМАНИЕ: ВНЕШНИЙ ПЕРЕХВАТ РУТ-КАНАЛА! СЕТЬ ЧВК 'CERBERUS' ДЕАКТИВИРОВАЛА ШИФРАТОР АТЛАНТИСА!");
+    await delay(2500);
+
+    await type("[БОРЗ (CERBERUS)]: Так, парень, замри на секунду и убери руки от брутфорса. Говорит Командир Борз. Я видел, как ты раскидал оборонительные шлюзы Атлантиса. Нам в отряде Церберов как раз нужны такие безбашенные хакеры.", "<span style='color:#00cc33;'>"); await delay(4500);
+    await type("[БОРЗ (CERBERUS)]: У нас критическая ситуация. Крысы из карательного ведомства L.a.S как-то умудрились взломать нашу оперативную кассету и прямо сейчас бьют по частотам нашей Алтайской вышки глушилки. Они хотят выкинуть нас из эфира.", "<span style='color:#00cc33;'>"); await delay(5000);
+    await type("[БОРЗ (CERBERUS)]: Мне нужна твоя помощь. Ты должен проникнуть в их багровую сеть и залить туда наш шпионский пакет данных, чтобы мы могли отследить их порты и устроить контрудар. Поможешь Церберам проучить этих ликвидаторов?", "<span style='color:#00cc33;'>"); await delay(4500);
+
+    addLine("\n1. Да, я помогу Церберам взломать сеть L.a.S.", "success");
+    addLine("2. Нет, я остаюсь на стороне контракта.", "error"); ask('ВЫБЕРИТЕ РЕШЕНИЕ (1-2):', 'borz_decision', false);
+}
+
+async function startLasInfiltrationSequence() {
+    DOM.out.innerHTML = ""; await bar(); playBeep(880, 'square', 0.4);
+    await type(">>> ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ L.a.S NETWORK... УСПЕШНО.", "success"); await delay(1200);
+    await type("===================================================", "success");
+    await type("⚡ ВЫ УСПЕШНО ВНЕДРИЛИ СЛЕДУЮЩИЕ ДАННЫЕ В КОНСОЛЬ LAS:", "success");
+    await type("---------------------------------------------------", "gray");
+    await type("🔑 Login:  ATLANTIS", "success");
+    await type("🔑 Пароль: 777", "success");
+    await type("---------------------------------------------------", "gray");
+    await type(">>> СИСТЕМА: Шпионский пакет Церберов зашит в ядро Ликвидаторов.", "gray");
+    await type("===================================================", "success");
     await delay(7000); location.reload();
 }
 DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
@@ -458,7 +491,7 @@ DOM.inp.onkeydown = async (e) => {
     } else if (step === 'contractors_menu') {
         if (cv === '1') ask('ВВЕДИТЕ ТОКЕН ДОСТУПА L.a.S:', 'check_las_pass', true);
         else if (cv === '2') ask('ВВЕДИТЕ ТОКЕН ДОСТУПА T.F.B:', 'check_tfb_pass', true);
-        else if (cv === '3') ask('ВВЕДИТЕ ТОКЕН ДОСТУПА RE-UNION:', 'check_reunion_pass', true); // Валидация нового токена!
+        else if (cv === '3') ask('ВВЕДИТЕ ТОКЕН ДОСТУПА RE-UNION:', 'check_reunion_pass', true);
         else { showEmployeeMenu(); }
     } else if (step === 'check_las_pass') {
         if (cv === '368') { await bar(); window.location.href = "https://github.io"; } else { err("🚨 ОШИБКА."); await delay(1500); showContractorsDepartmentMenu(); }
@@ -466,7 +499,18 @@ DOM.inp.onkeydown = async (e) => {
         if (cv === '868') { await bar(); window.location.href = "https://github.io"; } else { err("🚨 ОШИБКА."); await delay(1500); showContractorsDepartmentMenu(); }
     } else if (step === 'check_reunion_pass') {
         if (cv === '868') { await bar(); window.location.href = "https://github.io"; } else { err("🚨 НЕВЕРНЫЙ ТОКЕН НИИ."); await delay(1500); showContractorsDepartmentMenu(); }
-    } else if (step === 'andrey_p1_check') { if (cv === targetWord) startAndreyPhase2(); else die("🚨 ОШИБКА."); } 
+    } 
+    else if (step === 'borz_decision') {
+        let chk = cv.trim();
+        if (chk === '1') {
+            DOM.out.innerHTML = "";
+            await type("[БОРЗ (CERBERUS)]: Отличный выбор, боец! Дисциплина и расчет. Запоминай входные токены к их закрытой ячейке логов, которые мы успели перехватить:", "<span style='color:#00cc33;'>"); await delay(2000);
+            addLine("===================================================", "success"); addLine("🔓 ДАННЫЕ ДЛЯ ВХОДА В ДЕПАРТАМЕНТ L.a.S:"); addLine("📝 Login:  LAS", "success"); addLine("📝 Пароль: 555", "success"); addLine("===================================================", "success"); await delay(3000);
+            await type("[БОРЗ (CERBERUS)]: Вводи эти данные. Заливай контр-пакет и жди, пока наши турели Berserk выжгут их оперативников. Начинаем инфильтрацию!", "<span style='color:#00cc33;'>"); await delay(4000);
+            await startLasInfiltrationSequence();
+        } else { await terminalScramblerDie("🚨 [БОРЗ]: Отказываешься помогать? Значит, ты труп вместе со штабом Атлантиса. Запуск Скрамблера."); }
+    }
+    else if (step === 'andrey_p1_check') { if (cv === targetWord) startAndreyPhase2(); else die("🚨 ОШИБКА."); } 
     else if (step === 'andrey_p2_check') { if (cv.toUpperCase() === targetWord) startAndreyPhase3(); else die("🚨 ОШИБКА."); } 
     else if (step === 'andrey_p3_check') { 
         if (cv === targetWord) {
