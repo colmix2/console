@@ -67,7 +67,7 @@
         .terminal-box {
             width: 100%;
             max-width: 850px;
-            height: 85vh; /* Фиксируем по высоте экрана для No-Scroll внутреннего отображения */
+            height: 85vh; 
             background: var(--bg-panel);
             border: 2px solid var(--glow); 
             border-radius: 8px;
@@ -122,7 +122,7 @@
         .input-line {
             display: flex;
             align-items: center;
-            margin-top: auto; /* Ввод всегда снизу рамки дисплея */
+            margin-top: auto; 
             padding-top: 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             opacity: 0;
@@ -275,10 +275,8 @@ async function bar() {
         playBeep(550 + p * 2, 'sine', 0.02); await delay(40); 
     }
 }
-// ИСПРАВЛЕНО: Теперь меню разделено в зависимости от того, кто залогинился!
 async function showEmployeeMenu() {
     if (currentUser === 'bill') {
-        // У Билла по твоему запросу доступна ровно ОДНА вкладка — ПАРОЛИ!
         DOM.out.innerHTML = "";
         await type("========================================", "gray");
         await type("ДОБРО ПОЖАЛОВАТЬ, OPERATOR BILL!", "success");
@@ -288,7 +286,6 @@ async function showEmployeeMenu() {
         await type("========================================", "gray");
         ask('ВЫБЕРИТЕ ПУНКТ (1-2):', 'bill_menu_choice', false);
     } else {
-        // У Андрея остаётся стандартное полное меню
         DOM.out.innerHTML = "";
         await type("========================================", "gray");
         await type("ДОБРО ПОЖАЛОВАТЬ, ANDREY!", "success");
@@ -302,30 +299,29 @@ async function showEmployeeMenu() {
     }
 }
 
-// ИСПРАВЛЕНО: В меню окружения контрактников Андрея добавлен Департамент Re-Union!
 async function showContractorsDepartmentMenu() {
     DOM.out.innerHTML = "";
-    await type("=== СЕТЕВОЕ ОКРУЖЕНИЕ КОНТРАКТНИКОВ ===", "success");
+    await type("=== СЕТЕВОЕ ОДОБРЕНИЕ КОНТРАКТНИКОВ ===", "success");
     addLine("1. Департамент L.a.S", "success");
     addLine("2. Департамент T.F.B", "success");
-    addLine("3. Департамент Re-Union (НИИ Японии)", "success"); // Новая добавленная строчка!
+    addLine("3. Департамент Re-Union (НИИ Японии)", "success"); 
     addLine("4. НАЗАД В ГЛАВНОЕ МЕНЮ", "gray");
     ask('ВЫБЕРИТЕ ПОДРАЗДЕЛ (1-4):', 'contractors_menu', false);
 }
 function startAndreyPhase1() {
     DOM.out.innerHTML = "";
-    err("⚠️ КРИПТОГРАФИЧЕСКИЙ ТЕСТ: ИМПУЛЬСНЫЙ СДВИГ ЧАСТОТ! ФАЗА 1/4");
+    err("⚠️ КРИПТОГРАФИЧЕСКИЙ ТЕСТ: ИМПУЛЬСНЫЙ СДВИГ ЧАСТОТ! ФАЗА 1/3");
     let numParts = Array.from({length: 4}, () => Math.floor(Math.random() * 9) + 1);
     let rawNumberStr = numParts.join(""); let shift = Math.floor(Math.random() * 2) + 1; 
     targetWord = numParts.map(n => (n + shift) % 10).join("");
     addLine(`>>> ИСХОДНЫЙ СИГНАЛ:   [ ${rawNumberStr} ]`, "error");
     addLine(`>>> ПОПРАВКА СДВИГА:  [ +${shift} К КАЖДОЙ ЦИФРЕ ОТДЕЛЬНО ]`, "gray");
     ask('ВВЕДИТЕ ДЕКОД-ИМПУЛЬС:', 'andrey_p1_check', false);
-    clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 1."), 35000); // 35 секунд
+    clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 1."), 35000);
 }
 function startAndreyPhase2() {
     clearTimeout(wordTimer); addLine(">>> ПОТОК СДВИГА СИНХРОНИЗИРОВАН.", "success");
-    err("🚨 ТЕСТ ЗРИТЕЛЬНОЙ МАТРИЦЫ: СЛЕПОЕ ПЯТНО! ФАЗА 2/4");
+    err("🚨 ТЕСТ ЗРИТЕЛЬНОЙ МАТРИЦЫ: СЛЕПОЕ ПЯТНО! ФАЗА 2/3");
     let chars = "ABCXYZ12345"; let flashCode = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
     targetWord = flashCode; const d = addLine(`>>> МГНОВЕННЫЙ МАРКЕР ДОСТУПА: [ ${flashCode} ]`, "error"); playBeep(1100, 'sine', 0.15);
     setTimeout(() => { d.textContent = `>>> МГНОВЕННЫЙ МАРКЕР ДОСТУПА: [ СКРЫТО СИСТЕМОЙ ]`; ask('ВВЕДИТЕ КОД ПО ПАМЯТИ:', 'andrey_p2_check', false); }, 1500);
@@ -333,7 +329,7 @@ function startAndreyPhase2() {
 }
 function startAndreyPhase3() {
     clearTimeout(wordTimer); addLine(">>> МАТРИЦА ПАМЯТИ ПОДТВЕРЖДЕНА.", "success");
-    err("🚨 БИОМЕТРИЧЕСКИЙ АНАЛИЗ ЧАСТОТНЫХ ВОЛН! ФАЗА 3/4");
+    err("🚨 БИОМЕТРИЧЕСКИЙ АНАЛИЗ ЧАСТОТНЫХ ВОЛН! ФАЗА 3/3");
     let peaksCount = Math.floor(Math.random() * 4) + 2; targetWord = peaksCount.toString();
     let wave = "_"; for(let i=0; i<peaksCount; i++) { wave += "/\\_"; if(Math.random() > 0.5) wave += "__"; }
     addLine(`>>> СНЯТИЕ ПОКАЗАТЕЛЕЙ ВОЛНЫ: [ ${wave} ]`, "error");
@@ -349,7 +345,7 @@ function startAndreyPhase4() {
     ask('ВВЕДИТЕ КЛЮЧ:', 'andrey_p4_check', false);
     clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 ТАЙМАУТ ФАЗЫ 4."), 35000);
 }
-// ИСПРАВЛЕНО: Новая функция выдачи рутовых ключей Base / ATLANTIS111 в конце взлома Билла!
+// ИСПРАВЛЕНО: Билл мгновенно выдает рутовые ключи после успешной 3-й фазы (минуя 4-ю)!
 async function successBillPasswordExtraction() {
     clearTimeout(wordTimer); DOM.out.innerHTML = ""; await bar();
     await type("===================================================", "success");
@@ -388,7 +384,7 @@ function nextStage() {
         let ch = "0123456789ABCDEFXYZ!@#%", hex = Array.from({length: 8}, () => ch[Math.floor(Math.random() * ch.length)]).join("");
         d.textContent = `[DECRYPT KEY FLOW #${stage + 1}]: ` + hex; playBeep(400, 'sine', 0.005);
     }, 60);
-    DOM.inp.disabled = false; DOM.blk.add('active'); DOM.inp.focus();
+    DOM.inp.disabled = false; DOM.blk.classList.add('active'); DOM.inp.focus();
 }
 async function endKeyGame() {
     clearInterval(gameInterval); DOM.blk.classList.remove('active'); DOM.inp.disabled = true; await bar();
@@ -408,10 +404,22 @@ async function startPhaseFour() { step = 'phase4'; stage = 0; addLine(">>> ЧА�
 function nextPhaseFourAudio() { if (stage >= 3) { startPhaseFive(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let seq = []; for(let i=0; i<3+stage; i++) { seq.push(Math.random() > 0.5 ? "H" : "L"); } targetWord = seq.join(""); addLine(`[ФАЗА 4 - СИГНАЛ ${stage + 1}/3] ВОСПРОИЗВЕДЕНИЕ...`, "error"); triggerAudioChain(targetWord, 0); }
 function triggerAudioChain(w, i) { if(i >= w.length) { addLine(">>> ПОВТОРИТЕ ПОСЛЕДОВАТЕЛЬНОСТЬ (ПРИМЕР: HLHH):", "gray"); ask('ВВОД СИГНАЛА:', 'phase4', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => scramblerDie(), 35000); return; } const frequency = w[i].toUpperCase() === "H" ? 1500 : 300; playBeep(frequency, 'sine', 0.2); setTimeout(() => triggerAudioChain(w, i+1), 650); }
 async function startPhaseFive() { step = 'phase5'; stage = 0; addLine(">>> ЗВУКОВОЙ КАНАЛ СИНХРОНИЗИРОВАН.", "success"); await delay(600); err("🚨 КРИТИЧЕСКИЙ DDOS-ШТОРМ! СЕРВЕР ПЕРЕГРУЖЕН! ФАЗА 5"); nextPhaseFiveVirus(); }
-function nextPhaseFiveVirus() { if (stage >= 3) { startPhaseSix(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let len = 8 + stage * 2; let baseArr = Array.from({length: len}, () => Math.random() > 0.5 ? "1" : "0"); let normal = baseArr.join(""); let anomalyArr = [...baseArr]; anomalyArr[0] = anomalyArr[0] === "1" ? "0" : "1"; let anomaly = anomalyArr.join(""); let anomalyIdx = Math.floor(Math.random() * 4); let lines = []; for(let i=0; i<4; i++) { if(i === anomalyIdx) lines.push(anomaly); else lines.push(normal); } targetWord = (anomalyIdx + 1).toString(); addLine(`[ФАЗА 5 - ПОТОК ${stage + 1}/3] СКАНИРОВАНИЕ ПАКЕТОВ:`, "error"); for(let i=0; i<4; i++) addLine(`${i+1}: ${lines[i]}`, "gray"); ask('ВВЕДИТЕ НОМЕР АНОМАЛЬНОЙ СТРОКИ:', 'phase5', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 КРАШ."), 35000); }
+function nextPhaseFiveVirus() { if (stage >= 3) { startPhaseSix(); return; } DOM.blk.classList.remove('active'); DOM.inp.disabled = true; let len = 8 + stage * 2; let baseArr = Array.from({length: len}, () => Math.random() > 0.5 ? "1" : "0"); let normal = baseArr.join(""); let anomalyArr = [...baseArr]; anomalyArr = anomalyArr === "1" ? "0" : "1"; let anomaly = anomalyArr.join(""); let anomalyIdx = Math.floor(Math.random() * 4); let lines = []; for(let i=0; i<4; i++) { if(i === anomalyIdx) lines.push(anomaly); else lines.push(normal); } targetWord = (anomalyIdx + 1).toString(); addLine(`[ФАЗА 5 - ПОТОК ${stage + 1}/3] СКАНИРОВАНИЕ ПАКЕТОВ:`, "error"); for(let i=0; i<4; i++) addLine(`${i+1}: ${lines[i]}`, "gray"); ask('ВВЕДИТЕ НОМЕР АНОМАЛЬНОЙ СТРОКИ:', 'phase5', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 КРАШ."), 35000); }
 async function startPhaseSix() { step = 'phase6'; stage = 0; addLine(">>> ПОТОКИ ДАННЫХ ОЧИЩЕНЫ ОТ ВИРУСОВ.", "success"); await delay(600); err("🚨 СЕТЬ РАЗВАЛИВАЕТСЯ НА ЧАСТИ! ФИНАЛЬНАЯ МАРШРУТИЗАЦИЯ! ФАЗА 6"); nextPhaseSixRoute(); }
 function nextPhaseSixRoute() { if (stage >= 3) { endAllGamesSuccess(); return; } let ok = Math.random() > 0.5 ? "A" : "B"; targetWord = ok; addLine(`[ФАЗА 6 - ШЛЮЗ ${stage + 1}/3] АНАЛИЗ МАРШРУТОВ:`, "error"); addLine(`[МАРШРУТ А]: ` + (ok === "A" ? "ОТКРЫТ" : "БЛОК"), ok === "A" ? "success" : "error"); addLine(`[МАРШРУТ Б]: ` + (ok === "B" ? "ОТКРЫТ" : "БЛОК"), ok === "B" ? "success" : "error"); ask('ВЫБЕРИТЕ МАРШРУТ (А / Б):', 'phase6', false); clearTimeout(wordTimer); wordTimer = setTimeout(() => die("🚨 КРАШ."), 35000); }
-async function endAllGamesSuccess() { clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar(); await type(">>> ВСЕ 6 ФАЗ ОБХОДА ЗАВЕРШЕНЫ С ПОЛНЫМ ТРИУМФОМ!", "success"); await type("Департамент L.a.S 368", "success"); await type("Департамент T.F.B 868", "success"); await delay(2500); window.location.href = "https://google.com"; }
+// ИСПРАВЛЕНО: Финал 6-й фазы выдает секретный пароль к Департаменту Re-Union — 868!
+async function endAllGamesSuccess() { 
+    clearTimeout(wordTimer); document.body.classList.remove('alarm'); await bar(); 
+    await type(">>> ВСЕ 6 ФАЗ ОБХОДА ЗАВЕРШЕНЫ С ПОЛНЫМ ТРИУМФОМ!", "success"); 
+    await type(">>> КОРНЕВОЙ ДОСТУП ВЫРВАН. СЕТЬ ШТАБА АТЛАНТИСА ПОДАВЛЕНА.", "success"); 
+    await type("===================================================", "gray");
+    await type(">>> НАЙДЕНЫ СЕКРЕТНЫЕ КЛЮЧИ PMC ATLANTIS:", "success");
+    await type("🔓 Департамент L.a.S    :: Маркер 368", "success");
+    await type("🔓 Департамент T.F.B    :: Маркер 868", "success");
+    await type("🔓 Департамент Re-Union :: Маркер 868", "success"); // Наша новая награда!
+    await type("===================================================", "gray");
+    await delay(7000); location.reload();
+}
 DOM.inp.oninput = () => { if(step !== 'game') DOM.view.textContent = isMask ? "*".repeat(DOM.inp.value.length) : DOM.inp.value; };
 DOM.inp.onkeydown = async (e) => {
     if (e.key !== 'Enter') return;
@@ -424,7 +432,7 @@ DOM.inp.onkeydown = async (e) => {
         if (step === 'phase2') { if (cv.toUpperCase() === targetWord) { stage++; clearTimeout(wordTimer); addLine(">>> ПЕРЕХВАЧЕН.", "success"); await delay(400); nextPhaseTwoNode(); } else die("ОШИБКА!"); return; }
         if (step === 'phase3') { if (cv === targetWord) { stage++; clearTimeout(wordTimer); addLine(">>> СИНХРОН.", "success"); await delay(400); nextPhaseThreeNode(); } else die("ОШИБКА!"); return; }
         if (step === 'phase4') { if (cv.toUpperCase() === targetWord) { stage++; clearTimeout(wordTimer); addLine(">>> ГОТОВО.", "success"); await delay(400); nextPhaseFourAudio(); } else { await scramblerDie(); } return; }
-        if (step === 'phase5') { if (cv === targetWord) { stage++; clearTimeout(wordTimer); addLine(">>> ЧИСТО.", "success"); await delay(400); nextPhaseFiveVirus(); } else die("ОШИБКА!"); return; }
+        if (step === 'phase5') { if (cv === targetWord) { stage++; clearTimeout(wordTimer); addLine(">>> СИСТО.", "success"); await delay(400); nextPhaseFiveVirus(); } else die("ОШИБКА!"); return; }
         if (step === 'phase6') { let chk = cv.toUpperCase() === "A" || cv.toUpperCase() === "А" ? "A" : (cv.toUpperCase() === "B" || cv.toUpperCase() === "Б" ? "B" : ""); if (chk === targetWord) { stage++; nextPhaseSixRoute(); } else die("ОШИБКА!"); return; }
     }
 
@@ -444,26 +452,29 @@ DOM.inp.onkeydown = async (e) => {
         else if (cv === '4') { DOM.out.innerHTML = ""; ask('AGENT ID / EMPLOYEE:', 'login', false); }
         else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); showEmployeeMenu(); }
     } else if (step === 'bill_menu_choice') {
-        if (cv === '1') startAndreyPhase1(); // Взлом Билла по тем же фазам
+        if (cv === '1') startAndreyPhase1(); 
         else if (cv === '2') { DOM.out.innerHTML = ""; ask('AGENT ID / EMPLOYEE:', 'login', false); }
         else { err("НЕВЕРНЫЙ ВЫБОР."); await delay(1000); showEmployeeMenu(); }
     } else if (step === 'contractors_menu') {
         if (cv === '1') ask('ВВЕДИТЕ ТОКЕН ДОСТУПА L.a.S:', 'check_las_pass', true);
         else if (cv === '2') ask('ВВЕДИТЕ ТОКЕН ДОСТУПА T.F.B:', 'check_tfb_pass', true);
-        else if (cv === '3') { err("🚨 ОШИБКА: РАЗДЕЛ ЗАКРЫТ ДЛЯ ДАННОГО КЛАССА ДОСТУПА."); await delay(1500); showContractorsDepartmentMenu(); }
+        else if (cv === '3') ask('ВВЕДИТЕ ТОКЕН ДОСТУПА RE-UNION:', 'check_reunion_pass', true); // Валидация нового токена!
         else { showEmployeeMenu(); }
     } else if (step === 'check_las_pass') {
         if (cv === '368') { await bar(); window.location.href = "https://github.io"; } else { err("🚨 ОШИБКА."); await delay(1500); showContractorsDepartmentMenu(); }
     } else if (step === 'check_tfb_pass') {
         if (cv === '868') { await bar(); window.location.href = "https://github.io"; } else { err("🚨 ОШИБКА."); await delay(1500); showContractorsDepartmentMenu(); }
+    } else if (step === 'check_reunion_pass') {
+        if (cv === '868') { await bar(); window.location.href = "https://github.io"; } else { err("🚨 НЕВЕРНЫЙ ТОКЕН НИИ."); await delay(1500); showContractorsDepartmentMenu(); }
     } else if (step === 'andrey_p1_check') { if (cv === targetWord) startAndreyPhase2(); else die("🚨 ОШИБКА."); } 
     else if (step === 'andrey_p2_check') { if (cv.toUpperCase() === targetWord) startAndreyPhase3(); else die("🚨 ОШИБКА."); } 
-    else if (step === 'andrey_p3_check') { if (cv === targetWord) startAndreyPhase4(); else die("🚨 ОШИБКА."); } 
-    else if (step === 'andrey_p4_check') { 
-        if (cv.toUpperCase() === targetWord) { 
-            if (currentUser === 'bill') await successBillPasswordExtraction(); else await displayEncryptedReports(); 
+    else if (step === 'andrey_p3_check') { 
+        if (cv === targetWord) {
+            if (currentUser === 'bill') await successBillPasswordExtraction(); else startAndreyPhase4(); 
         } else die("🚨 ОШИБКА."); 
-    } else if (step === 'select_report') {
+    } 
+    else if (step === 'andrey_p4_check') { if (cv.toUpperCase() === targetWord) await displayEncryptedReports(); else die("🚨 ОШИБКА."); } 
+    else if (step === 'select_report') {
         if (cv === correctReportOption.toString()) { await bar(); window.location.href = "https://google.com"; } else { err("🚨 ОШИБКА."); await delay(1500); showEmployeeMenu(); }
     }
 };
